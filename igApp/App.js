@@ -2,7 +2,6 @@ import React from 'react';
 import * as firebase from 'firebase'
 import { StyleSheet, Text, View } from 'react-native';
 
-
 // Initialize firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBF1_cjUctLu7QtlOh-T-3xpaePS_8So5U",
@@ -11,39 +10,38 @@ const firebaseConfig = {
   storageBucket: "ecs165a.appspot.com",
 };
 const firebaseApp = firebase.initializeApp(firebaseConfig);
-this.itemsRef = firebaseApp.database().ref();
 
+//The reference to the root of the database, which is "Users"
+const rootRef = firebase.database().ref();
+
+//The reference to the children of "Users", which is "name: Thomas Munduchira"
+const nameRef = rootRef.child('Users');
 
 export default class App extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      //Initialize the state "displayName" to nothing for now
+      //we want to eventually print "Hello <displayName>"
+      displayName: ""
+    }
+  }
 
-  //get firebase information
-  listenForItems(itemsRef) {
-    itemsRef.on('value', (snap) => {
-
-      // get children as an array
-      var items = [];
-      snap.forEach((child) => {
-        items.push({
-          title: child.val().title,
-          _key: child.key
-        });
-      });
-
+  componentDidMount(){
+    //Get a firebase snapshot of "name: Thomas Munduchira"
+    nameRef.on("value", (childSnapshot) => {
       this.setState({
-        dataSource: this.state.dataSource.cloneWithRows(items)
-      });
+        displayName: childSnapshot.val().name //set displayName to "Thomas Munduchira"
+      })
 
-    });
+    })
   }
-  componentDidMount() {
-    this.listenForItems(this.itemsRef);
-  }
-
 
   render() {
     return (
       <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
+        {/* Display "Hello Thomas Munduchira" */}
+        <Text>Hello {this.state.displayName}</Text>
       </View>
     );
   }
