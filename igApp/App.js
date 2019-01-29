@@ -15,7 +15,7 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 const rootRef = firebase.database().ref();
 
 //The reference to the children of "Users", which is "name: Thomas Munduchira"
-const nameRef = rootRef.child('Users');
+const userRef = rootRef.child('Users/userID1');
 
 export default class App extends React.Component {
   constructor(props){
@@ -29,9 +29,9 @@ export default class App extends React.Component {
 
   componentDidMount(){
     //Get a firebase snapshot of "name: Thomas Munduchira"
-    nameRef.on("value", (childSnapshot) => {
+    userRef.on("value", (childSnapshot) => {
       this.setState({
-        displayName: childSnapshot.val().name //set displayName to "Thomas Munduchira"
+        displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name//set displayName to "Thomas Munduchira"
       })
 
     })
