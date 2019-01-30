@@ -1,6 +1,6 @@
 import React from 'react';
 import * as firebase from 'firebase'
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 
 // Initialize firebase
 const firebaseConfig = {
@@ -31,16 +31,18 @@ export default class App extends React.Component {
     //Get a firebase snapshot of "name: Thomas Munduchira"
     userRef.on("value", (childSnapshot) => {
       this.setState({
-        displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name//set displayName to "Thomas Munduchira"
+        displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name, //set displayName to "Thomas Munduchira"
+        profilePicture: childSnapshot.val().profile_picture
       })
-
     })
   }
 
   render() {
+    //const profilePictureURL = this.state.profilePicture;
     return (
       <View style={styles.container}>
         {/* Display "Hello Thomas Munduchira" */}
+        <Image style={{width: 200, height: 200}} source={{uri: this.state.profilePicture}}/>
         <Text>Hello {this.state.displayName}</Text>
       </View>
     );
@@ -53,5 +55,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
+  }
 });
