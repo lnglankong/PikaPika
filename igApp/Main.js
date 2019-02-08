@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
-import * as firebase from 'firebase'
+
+import firebase from './Firebase.js'
 
 //The reference to the root of the database, which is "Users"
 const rootRef = firebase.database().ref();
