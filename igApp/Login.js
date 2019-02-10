@@ -15,7 +15,7 @@ export default class Login extends React.Component {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => this.props.navigation.navigate('Main'))
+      .then(() => this.props.navigation.navigate('MainStackNavigator'))
       .catch(error => this.setState({ errorMessage: error.message }))
     }
 
@@ -24,7 +24,7 @@ export default class Login extends React.Component {
       <View style={styles.container}>
         <Text>Login</Text>
         {
-          this.state.errorMessage && 
+          this.state.errorMessage &&
           <Text style={{ color: 'red' }}>
             {this.state.errorMessage}
           </Text>

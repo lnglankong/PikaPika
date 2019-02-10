@@ -1,50 +1,80 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, Platform } from 'react-native';
+import { createSwitchNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation'
 
-import firebase from './Firebase.js'
-
-//The reference to the root of the database, which is "Users"
-const rootRef = firebase.database().ref();
-
-//The reference to the children of "Users", which is "name: Thomas Munduchira"
-const userRef = rootRef.child('Users/userID1');
+import AddMediaTab from './AddMediaTab'
+import HomeTab from './HomeTab'
+import LikesTab from './LikesTab'
+import ProfileTab from './ProfileTab'
+import SearchTab from './SearchTab'
+import EditProfile from './EditProfile'
 
 export default class Main extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      //Initialize the state "displayName" to nothing for now
-      //we want to eventually print "Hello <displayName>"
-      displayName: ""
-    }
-  }
-
-  componentDidMount(){
-    //Get a firebase snapshot of "name: Thomas Munduchira"
-    userRef.on("value", (childSnapshot) => {
-      this.setState({
-        displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name, //set displayName to "Thomas Munduchira"
-        profilePicture: childSnapshot.val().profile_picture
-      })
-    })
-  }
 
   render() {
     //const profilePictureURL = this.state.profilePicture;
     return (
-      <View style={styles.container}>
-        {/* Display "Hello Thomas Munduchira" */}
-        <Image style={{width: 200, height: 200}} source={{uri: this.state.profilePicture}}/>
-        <Text>Hello {this.state.displayName}</Text>
-      </View>
+      <AppTabNavigator />
     );
   }
 }
 
+const ProfileTabStackNavigator = createAppContainer(createSwitchNavigator(
+  {
+    ProfileTab:{
+      screen: ProfileTab
+    },
+
+    EditProfile:{
+      screen: EditProfile
+    }
+  }
+));
+
+const AppTabNavigator = createAppContainer(createBottomTabNavigator(
+    {
+
+      HomeTab: {
+          screen: HomeTab
+      },
+      SearchTab: {
+          screen: SearchTab
+
+      },
+      AddMediaTab: {
+          screen: AddMediaTab
+      },
+      LikesTab: {
+          screen: LikesTab
+      },
+      ProfileTab: {
+          screen: ProfileTabStackNavigator
+      }
+
+    }
+), {
+        animationEnabled: true,
+        swipeEnabled: true,
+        tabBarPosition: "bottom",
+        tabBarOptions: {
+            style: {
+                ...Platform.select({
+                    android: {
+                        backgroundColor: '#FFB6C1'
+                    }
+                })
+            },
+            activeTintColor: '#000',
+            inactiveTintColor: '#d1cece',
+            showLabel: false,
+            showIcon: true
+        }
+    })
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFB6C1',
     alignItems: 'center',
     justifyContent: 'center',
   }
