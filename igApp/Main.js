@@ -9,7 +9,7 @@ const rootRef = firebase.database().ref();
 //The reference to the children of "Users", which is "name: Thomas Munduchira"
 const userRef = rootRef.child('Users/userID1');
 
-export default class App extends React.Component {
+export default class Main extends React.Component {
   constructor(props){
     super(props);
     this.state = {

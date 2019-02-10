@@ -6,7 +6,8 @@ import firebase from './Firebase.js'
 export default class Loading extends React.Component {
   componentDidMount() {
     firebase.auth().onAuthStateChanged(user => {
-      this.props.navigation.navigate(user ? 'Main' : 'Login')
+     // this.props.navigation.navigate(user ? 'Main' : 'Login')
+     this.props.navigation.navigate('Login')
     })
   }
 
