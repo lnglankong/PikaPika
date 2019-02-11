@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {View, Text, StyleSheet, Image, Button} from "react-native";
 import firebase from './Firebase'
+import {HeaderBackButton} from 'react'
 
 //The reference to the root of the database, which is "Users"
 const rootRef = firebase.database().ref();

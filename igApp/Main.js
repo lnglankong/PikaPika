@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Platform } from 'react-native';
-import { createSwitchNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation'
+import { createStackNavigator, createBottomTabNavigator, createAppContainer, HeaderBackButton } from 'react-navigation'
 
 import AddMediaTab from './AddMediaTab'
 import HomeTab from './HomeTab'
@@ -19,14 +19,71 @@ export default class Main extends React.Component {
   }
 }
 
-const ProfileTabStackNavigator = createAppContainer(createSwitchNavigator(
+const navigationOptionsEditProfile = ({ navigation }) => ({
+    headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
+})
+
+const ProfileTabStackNavigator = createAppContainer(createStackNavigator(
   {
     ProfileTab:{
-      screen: ProfileTab
+      screen: ProfileTab,
+      navigationOptions: {
+        headerTitleStyle: { alignSelf: 'center', flex:1 },
+        title: 'Profile',
+      },
     },
 
     EditProfile:{
-      screen: EditProfile
+      screen: EditProfile,
+      navigationOptionsEditProfile
+    }
+  }
+));
+
+const LikesTabStackNavigator = createAppContainer(createStackNavigator(
+  {
+    LikesTab:{
+      screen: LikesTab,
+      navigationOptions: {
+        title: 'Likes',
+        headerTitleStyle: { alignSelf: 'center', flex:1 },
+      }
+    }
+  }
+));
+
+const HomeTabStackNavigator = createAppContainer(createStackNavigator(
+  {
+    HomeTab:{
+      screen: HomeTab,
+      navigationOptions: {
+        title: 'Home',
+        headerTitleStyle: { alignSelf: 'center', flex:1 },
+      }
+    }
+  }
+));
+
+const SearchTabStackNavigator = createAppContainer(createStackNavigator(
+  {
+    SearchTab:{
+      screen: SearchTab,
+      navigationOptions: {
+        title: 'Search',
+        headerTitleStyle: { alignSelf: 'center', flex:1 },
+      }
+    }
+  }
+));
+
+const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
+  {
+    AddMediaTab:{
+      screen: AddMediaTab,
+      navigationOptions: {
+        title: 'Media',
+        headerTitleStyle: { alignSelf: 'center', flex:1},
+      }
     }
   }
 ));
@@ -35,20 +92,19 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
     {
 
       HomeTab: {
-          screen: HomeTab
+          screen: HomeTabStackNavigator,
       },
       SearchTab: {
-          screen: SearchTab
-
+          screen: SearchTabStackNavigator,
       },
       AddMediaTab: {
-          screen: AddMediaTab
+          screen: AddMediaTabStackNavigator,
       },
       LikesTab: {
-          screen: LikesTab
+          screen: LikesTabStackNavigator,
       },
       ProfileTab: {
-          screen: ProfileTabStackNavigator
+          screen: ProfileTabStackNavigator,
       }
 
     }
