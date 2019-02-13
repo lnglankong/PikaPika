@@ -5,9 +5,6 @@ import firebase from './Firebase.js'
 //The reference to the root of the database
 const rootRef = firebase.database().ref();
 
-//The reference to the user
-const userRef = rootRef.child('Users/userID1');
-
 class EditProfile extends Component{
   state =
   {
@@ -20,14 +17,37 @@ class EditProfile extends Component{
 
   //save profile edits
   handleProfileEdit = () => {
+    //get logged-in user
+    var loginFile = require('./Login');
+
+    //get reference to the logged in user from database
+    const userRef = rootRef.child('Users/' + loginFile.loggedInUser);
+
+    //if first_name was edited, update firebase
     if(this.state.first_name != ''){
+      //update first name on firebase database
       userRef.update({first_name: this.state.first_name});
     }
+
+    //if last_name was edited, update firebase
     if(this.state.last_name != ''){
+      //update last name on firebase database
       userRef.update({last_name: this.state.last_name});
     }
+
+    //if email was edited, update firebase
     if(this.state.email != ''){
+      //update email on firebase authentication
+      firebase.auth()
+          .signInWithEmailAndPassword(loginFile.email, loginFile.password)
+          .then((userCredential) => {
+              userCredential.user.updateEmail(this.state.email)
+          })
+
+      //update email on firebase database
       userRef.update({email: this.state.email});
+
+
     }
     if(this.state.biography != ''){
       userRef.update({biography: this.state.biography});

@@ -3,6 +3,16 @@ import { StyleSheet, Text, TextInput, View, Button} from 'react-native'
 
 import firebase from './Firebase.js'
 
+//root reference of database
+const rootRef = firebase.database().ref();
+
+//reference to users branch
+const userRef = rootRef.child('Users/');
+
+let loggedInUser = "defaultUser";
+let password = "defaultPassword";
+let email = "defaultUser";
+
 export default class Login extends React.Component {
   state = {
     email: '',
@@ -11,13 +21,23 @@ export default class Login extends React.Component {
   }
 
   handleLogin = () => {
+
     const { email, password } = this.state
+
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => this.props.navigation.navigate('Main'))
       .catch(error => this.setState({ errorMessage: error.message }))
-    }
+
+    //find login ID of user by looping through all users in database
+    userRef.orderByChild("email").equalTo(email).on("child_added", function(snapshot) {
+        //export the userID, email, and password of logged in user.
+        module.exports.loggedInUser = snapshot.key;
+        module.exports.password = password;
+        module.exports.email = email;
+      });
+  }
 
   render() {
     return (

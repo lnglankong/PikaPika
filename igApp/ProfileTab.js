@@ -2,12 +2,10 @@ import React, {Component} from "react";
 import {View, Text, StyleSheet, Image, Button} from "react-native";
 import firebase from './Firebase'
 import {HeaderBackButton} from 'react'
+import Login from './Login.js'
 
 //The reference to the root of the database, which is "Users"
 const rootRef = firebase.database().ref();
-
-//The reference to the children of "Users", which is "name: Thomas Munduchira"
-const userRef = rootRef.child('Users/userID1');
 
 class ProfileTab extends Component{
   constructor(props){
@@ -21,9 +19,16 @@ class ProfileTab extends Component{
   }
 
   componentDidMount(){
-    //Get a firebase snapshot of "name: Thomas Munduchira"
+    //get logged-in user
+    var loginFile = require('./Login');
+
+    //get reference to the logged in user from database
+    const userRef = rootRef.child('Users/' + loginFile.loggedInUser);
+
     userRef.on("value", (childSnapshot) => {
       this.setState({
+
+
         displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name, //set displayName to "Thomas Munduchira"
         profilePicture: childSnapshot.val().profile_picture,
 
