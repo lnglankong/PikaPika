@@ -1,5 +1,6 @@
 import React from 'react'
-import { StyleSheet, Text, TextInput, View, Button} from 'react-native'
+import { StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native'
+import { Button } from 'react-native-elements';
 
 import firebase from './Firebase.js'
 
@@ -42,7 +43,7 @@ export default class Login extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Login</Text>
+        <Text style = {styles.textPika}>PikaPika</Text>
         {
           this.state.errorMessage &&
           <Text style={{ color: 'red' }}>
@@ -64,9 +65,16 @@ export default class Login extends React.Component {
           onChangeText={password => this.setState({ password })}
           value={this.state.password}
         />
-        <Button title="Login" onPress={this.handleLogin} />
+       <Button
+          title = "login"
+          buttonStyle ={styles.loginBackground}
+          onPress={this.handleLogin} 
+        /> 
+
         <Button
           title="Don't have an account? Sign Up"
+          type = "clear"
+          color = "black"
           onPress={() => this.props.navigation.navigate('SignUp')}
         />
       </View>
@@ -77,14 +85,33 @@ export default class Login extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor:'#F7D2F7' 
+  },
+  textPika: {
+    fontSize: 20,
+    fontFamily:"Chalkboard SE",
+    marginTop:120
   },
   textInput: {
-    height: 40,
-    width: '90%',
-    borderColor: 'gray',
+    height: 45,
+    width: 320,
+    borderColor: 'black',
+    backgroundColor:'#FFFFFF',
     borderWidth: 1,
-    marginTop: 8
+    marginTop: 30
+  },
+  loginText:{
+    color:'#fff',
+    textAlign:'center',
+    paddingLeft : 10,
+    paddingRight : 10
+  },
+  loginBackground:{
+    height: 45,
+    width: 320,
+    backgroundColor:'#A5E7FF',
+    borderWidth: 1,
+    marginTop:30
   }
 })
