@@ -66,14 +66,14 @@ export default class SignUp extends React.Component {
         <TextInput
           placeholder="Username"
           autoCapitalize="none"
-          style={styles.textInput}
+          style={styles.firstTextInput}
           onChangeText={username => this.setState({ username })}
           value={this.state.username}
         /> 
         <TextInput
           placeholder="Email"
           autoCapitalize="none"
-          style={styles.firstTextInput}
+          style={styles.textInput}
           onChangeText={email => this.setState({ email })}
           value={this.state.email}
         />
