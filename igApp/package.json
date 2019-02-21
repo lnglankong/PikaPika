@@ -1,4 +1,5 @@
 {
+  "name": "igApp",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -6,8 +7,13 @@
     "ios": "expo start --ios",
     "eject": "expo eject"
   },
+  "rnpm": {
+    "assets": [
+      "assets/fonts/ChalkboardSE"
+    ]
+  },
   "dependencies": {
-    "expo": "^32.0.0",
+    "expo": "^32.0.6",
     "expo-firebase-analytics": "^2.0.0",
     "expo-firebase-app": "^2.0.0",
     "expo-firebase-auth": "^2.0.0",
@@ -29,7 +35,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-elements": "^1.0.0",
     "react-native-tab-navigator": "^0.3.4",
-    "react-navigation": "^3.2.1"
+    "react-navigation": "^3.3.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0"

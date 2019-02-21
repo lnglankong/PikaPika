@@ -1,6 +1,7 @@
 import React from 'react'
-import { StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native'
 import { Button } from 'react-native-elements';
+import { Font } from 'expo';
 
 import firebase from './Firebase.js'
 
@@ -16,9 +17,22 @@ let email = "defaultUser";
 
 export default class Login extends React.Component {
   state = {
+    fontLoaded: false,
     email: '',
     password: '',
     errorMessage: null
+  }
+
+  //Load correct font for android
+  async componentDidMount() {
+
+
+    await Expo.Font.loadAsync({
+      'Chalkboard SE': require('./assets/fonts/ChalkboardSE.ttf')
+    }).then(() => {
+      this.setState({ fontLoaded: true });
+    })
+
   }
 
   handleLogin = () => {
@@ -43,7 +57,7 @@ export default class Login extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style = {styles.textPika}>PikaPika</Text>
+        <Text style = {Platform.OS === 'ios' ? styles.textPika : (this.state.fontLoaded == true ? styles.textPika : '')}>PikaPika</Text>
         {
           this.state.errorMessage &&
           <Text style={{ color: 'red' }}>
@@ -68,8 +82,8 @@ export default class Login extends React.Component {
        <Button
           title = "login"
           buttonStyle ={styles.loginBackground}
-          onPress={this.handleLogin} 
-        /> 
+          onPress={this.handleLogin}
+        />
 
         <Button
           title="Don't have an account? Sign Up"
@@ -86,7 +100,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor:'#F7D2F7' 
+    backgroundColor:'#F7D2F7'
   },
   textPika: {
     fontSize: 20,

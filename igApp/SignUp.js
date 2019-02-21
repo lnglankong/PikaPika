@@ -1,7 +1,8 @@
 // SignUp.js
 import React from 'react';
-import { StyleSheet, Text, View, Image, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, Platform } from 'react-native';
 import { Button } from 'react-native-elements';
+import { Font } from 'expo';
 
 import firebase from './Firebase.js'
 
@@ -9,21 +10,37 @@ export default class SignUp extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      username: '', 
-      email: '', 
-      password: '', 
-      errorMessage: null 
+      username: '',
+      email: '',
+      password: '',
+      errorMessage: null
     };
     this.handleSignUp = this.handleSignUp.bind(this);
     this.createUser = this.createUser.bind(this);
   }
-  
+
+  state = {
+    fontLoaded: false
+  };
+
+  //Load correct font for android
+  async componentDidMount() {
+
+
+    await Expo.Font.loadAsync({
+      'Chalkboard SE': require('./assets/fonts/ChalkboardSE.ttf')
+    }).then(() => {
+      this.setState({ fontLoaded: true });
+    })
+
+  }
+
   //Constructor for new user in database
   createUser(username, email){
     //Add user to User table with a unique key
     const userRef = firebase.database().ref('Users/').push({
       username,
-      'biography': '',  
+      'biography': '',
       email,
       'first_name': '',
       'last_name': '',
@@ -52,13 +69,15 @@ export default class SignUp extends React.Component {
           .then(() => this.props.navigation.navigate('Main'))
           .catch(error => this.setState({ errorMessage: error.message }))
       }
-    })  
+    })
   }
+
+
 
   render() {
     return (
       <View style={styles.container}>
-        <Text>Sign Up</Text>
+        <Text style = {Platform.OS === 'ios' ? styles.textPika : (this.state.fontLoaded == true ? styles.textPika : '')}>Sign Up</Text>
         {this.state.errorMessage &&
           <Text style={{ color: 'red' }}>
             {this.state.errorMessage}
@@ -69,7 +88,7 @@ export default class SignUp extends React.Component {
           style={styles.firstTextInput}
           onChangeText={username => this.setState({ username })}
           value={this.state.username}
-        /> 
+        />
         <TextInput
           placeholder="Email"
           autoCapitalize="none"
@@ -85,10 +104,10 @@ export default class SignUp extends React.Component {
           onChangeText={password => this.setState({ password })}
           value={this.state.password}
         />
-        <Button 
+        <Button
           buttonStyle ={styles.loginBackground}
-          title="Join Now" 
-          onPress={this.handleSignUp} 
+          title="Join Now"
+          onPress={this.handleSignUp}
         />
         <Button
           type = "clear"
@@ -104,7 +123,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor:'#F7D2F7' 
+    backgroundColor:'#F7D2F7'
   },
   textPika: {
     fontSize: 20,
@@ -117,7 +136,7 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     backgroundColor:'#FFFFFF',
     borderWidth: 1,
-    marginTop: 160
+    marginTop: 30
   },
   textInput: {
     height: 45,
