@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Button, Image, Alert } from "react-native";
+import { View, Text, StyleSheet, Button, Image, Alert, Platform} from "react-native";
 import { ImagePicker, Permissions } from "expo";
 
 import firebase from './Firebase.js'
@@ -22,23 +22,75 @@ class AddMediaTab extends Component{
 
   //choose a picture from user's camera roll to upload
   selectPicture = async () => {
-    await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    const { cancelled, uri } = await ImagePicker.launchImageLibraryAsync({
-      aspect: 1,
-      allowsEditing: true,
-    });
-    if (!cancelled) {
-      try {
-        // upload image using current time as unique photo ID in storage
-        const currentTime = Date.now();
-        const uploadUrl = await this.uploadImage(uri, currentTime);
-        this.setState({ image: uploadUrl });
-        Alert.alert("Success");
+
+    // ------ IOS ---------
+    if(Platform.OS === 'ios'){ //ios, camera roll permission needed
+      const {status} = await Permissions.askAsync(Permissions.CAMERA_ROLL)
+
+      if(status !== 'granted'){ //user doesn't give camera roll permissions
+        alert('You must enable camera permissions in order to upload an image');
+      }else{ //user gives camera roll permissions
+        const { cancelled, uri } = await ImagePicker.launchImageLibraryAsync({
+          aspect: [12,12],
+          allowsEditing: true,
+        });
+        if (!cancelled) {
+          try {
+            // upload image using current time as unique photo ID in storage
+            const currentTime = Date.now();
+            const uploadUrl = await this.uploadImage(uri, currentTime);
+            this.setState({ image: uploadUrl });
+            Alert.alert("Success");
+          }
+          catch (error) {
+            Alert.alert(error);
+          }
+        }
       }
-      catch (error) {
-        Alert.alert(error);
+
+    //------ ANDROID ---------
+    }else{ //android, no camera roll permission needed
+
+      const { cancelled, uri } = await ImagePicker.launchImageLibraryAsync({
+        aspect: [12,12],
+        allowsEditing: true,
+      });
+      if (!cancelled) {
+        try {
+          // upload image using current time as unique photo ID in storage
+          const currentTime = Date.now();
+          const uploadUrl = await this.uploadImage(uri, currentTime);
+          this.setState({ image: uploadUrl });
+          Alert.alert("Success");
+        }
+        catch (error) {
+          Alert.alert(error);
+        }
       }
     }
+
+    console.log("status: " + status);
+    if(status !== 'granted' || ''){ //user doesn't give camera roll permissions
+      alert('You must enable camera permissions in order to upload an image');
+    }else{ //user gives camera roll permissions
+      const { cancelled, uri } = await ImagePicker.launchImageLibraryAsync({
+        aspect: [12,12],
+        allowsEditing: true,
+      });
+      if (!cancelled) {
+        try {
+          // upload image using current time as unique photo ID in storage
+          const currentTime = Date.now();
+          const uploadUrl = await this.uploadImage(uri, currentTime);
+          this.setState({ image: uploadUrl });
+          Alert.alert("Success");
+        }
+        catch (error) {
+          Alert.alert(error);
+        }
+      }
+    }
+
   }
 
   //take a picture from user's phone
@@ -81,7 +133,7 @@ class AddMediaTab extends Component{
     // imageName is the current time
     const ref = firebase.storage().ref()
       .child(this.state.userID + "/" + imageName);
-  
+
     const snapshot = await ref.put(blob);
 
     // We're done with the blob, close and release it
@@ -89,7 +141,7 @@ class AddMediaTab extends Component{
 
     return await snapshot.ref.getDownloadURL();
   }
-  
+
   render(){
     return(
       <View style = {styles.container}>
@@ -112,7 +164,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     image: {
-      width: 300, 
+      width: 300,
       height: 300,
       backgroundColor: 'gray'
     }
