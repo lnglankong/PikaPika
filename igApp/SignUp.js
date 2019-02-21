@@ -1,6 +1,7 @@
 // SignUp.js
 import React from 'react';
-import { StyleSheet, Text, View, Image, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput } from 'react-native';
+import { Button } from 'react-native-elements';
 
 import firebase from './Firebase.js'
 
@@ -65,7 +66,7 @@ export default class SignUp extends React.Component {
         <TextInput
           placeholder="Username"
           autoCapitalize="none"
-          style={styles.textInput}
+          style={styles.firstTextInput}
           onChangeText={username => this.setState({ username })}
           value={this.state.username}
         /> 
@@ -84,8 +85,13 @@ export default class SignUp extends React.Component {
           onChangeText={password => this.setState({ password })}
           value={this.state.password}
         />
-        <Button title="Sign Up" onPress={this.handleSignUp} />
+        <Button 
+          buttonStyle ={styles.loginBackground}
+          title="Join Now" 
+          onPress={this.handleSignUp} 
+        />
         <Button
+          type = "clear"
           title="Already have an account? Login"
           onPress={() => this.props.navigation.navigate('Login')}
         />
@@ -97,14 +103,41 @@ export default class SignUp extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor:'#F7D2F7' 
+  },
+  textPika: {
+    fontSize: 20,
+    fontFamily:"Chalkboard SE",
+    marginTop:120
+  },
+  firstTextInput:{
+    height: 45,
+    width: 320,
+    borderColor: 'black',
+    backgroundColor:'#FFFFFF',
+    borderWidth: 1,
+    marginTop: 160
   },
   textInput: {
-    height: 40,
-    width: '90%',
-    borderColor: 'gray',
+    height: 45,
+    width: 320,
+    borderColor: 'black',
+    backgroundColor:'#FFFFFF',
     borderWidth: 1,
-    marginTop: 8
+    marginTop: 30
+  },
+  loginText:{
+    color:'#fff',
+    textAlign:'center',
+    paddingLeft : 10,
+    paddingRight : 10
+  },
+  loginBackground:{
+    height: 45,
+    width: 320,
+    backgroundColor:'#A5E7FF',
+    borderWidth: 1,
+    marginTop:30
   }
 })
