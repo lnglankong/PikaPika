@@ -9,8 +9,7 @@
   },
   "rnpm": {
     "assets": [
-      "assets/fonts/ChalkboardSE",
-      "assets/fonts/icomoon"
+      "assets/fonts/ChalkboardSE"
     ]
   },
   "dependencies": {
