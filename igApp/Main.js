@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer, HeaderBackButton } from 'react-navigation'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import AddMediaTab from './AddMediaTab'
 import HomeTab from './HomeTab'
@@ -25,15 +26,18 @@ const navigationOptionsEditProfile = ({ navigation }) => ({
 
 const ProfileTabStackNavigator = createAppContainer(createStackNavigator(
   {
-    ProfileTab:{
+    ProfileTab:{ // view for profile
       screen: ProfileTab,
       navigationOptions: {
-        headerTitleStyle: { alignSelf: 'center', flex:1 },
+        headerTitleStyle: { alignSelf: 'center', flex:1},
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
         title: 'Profile',
       },
     },
 
-    EditProfile:{
+    EditProfile:{ // view for edit profile, which is inside profile view
       screen: EditProfile,
       navigationOptionsEditProfile
     }
@@ -44,10 +48,13 @@ const LikesTabStackNavigator = createAppContainer(createStackNavigator(
   {
     LikesTab:{
       screen: LikesTab,
-      navigationOptions: {
+      navigationOptions: { // options for header
         title: 'Likes',
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
         headerTitleStyle: { alignSelf: 'center', flex:1 },
-      }
+      } 
     }
   }
 ));
@@ -56,8 +63,11 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
   {
     HomeTab:{
       screen: HomeTab,
-      navigationOptions: {
+      navigationOptions: {// options for header
         title: 'Home',
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
         headerTitleStyle: { alignSelf: 'center', flex:1 },
       }
     }
@@ -68,8 +78,11 @@ const SearchTabStackNavigator = createAppContainer(createStackNavigator(
   {
     SearchTab:{
       screen: SearchTab,
-      navigationOptions: {
+      navigationOptions: {// options for header
         title: 'Search',
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
         headerTitleStyle: { alignSelf: 'center', flex:1 },
       }
     }
@@ -80,8 +93,11 @@ const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
   {
     AddMediaTab:{
       screen: AddMediaTab,
-      navigationOptions: {
+      navigationOptions: {// options for header
         title: 'Media',
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
         headerTitleStyle: { alignSelf: 'center', flex:1},
       }
     }
@@ -93,39 +109,61 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
 
       HomeTab: {
           screen: HomeTabStackNavigator,
+          navigationOptions: {
+            tabBarIcon: ({focused}) => ( // insert image for the home button
+              <Image style={{ width: 58, height: 58 }} 
+                     source={focused? require('./assets/images/house_colored.png'): require('./assets/images/house.png')} />
+            )
+          }
       },
-      SearchTab: {
-          screen: SearchTabStackNavigator,
-      },
+
+      // search tab is not necessary in bottom tab bar
+      // SearchTab: {
+      //     screen: SearchTabStackNavigator,
+      // },
+
       AddMediaTab: {
           screen: AddMediaTabStackNavigator,
+          navigationOptions: {
+            tabBarIcon: ({focused}) =>(
+              focused? 
+            <Image style={{ width: 54, height: 54 }} source={require('./assets/images/camera_colored.png')} />:
+            <Image style={{ width: 54, height: 54 }} source={require('./assets/images/camera.png')} />
+            )}
       },
-      LikesTab: {
-          screen: LikesTabStackNavigator,
-      },
+
+      // likes tab is not necessary in bottom tab bar
+      // LikesTab: {
+      //     screen: LikesTabStackNavigator,
+      // },
+
       ProfileTab: {
           screen: ProfileTabStackNavigator,
+
+          navigationOptions: {
+            tabBarIcon: ({focused}) => 
+              <Image style={{ width: 54, height: 54 }} 
+                    source={focused? require('./assets/images/profile_colored.png'):require('./assets/images/profile.png')} />,
+            
+          }
       }
 
-    }
-), {
-        animationEnabled: true,
-        swipeEnabled: true,
-        tabBarPosition: "bottom",
-        tabBarOptions: {
-            style: {
-                ...Platform.select({
-                    android: {
-                        backgroundColor: '#FFB6C1'
-                    }
-                })
-            },
-            activeTintColor: '#000',
-            inactiveTintColor: '#d1cece',
-            showLabel: false,
-            showIcon: true
-        }
-    })
+    },
+    {
+      animationEnabled: true,
+      swipeEnabled: true,
+      tabBarPosition: "bottom",
+      tabBarOptions: {
+          style: {
+            backgroundColor:'#FFB6C1',
+          },
+          inactiveTintColor: '#d1cece',
+          showLabel: false,
+          showIcon: true
+      }
+  }
+)
+)
 
 const styles = StyleSheet.create({
   container: {

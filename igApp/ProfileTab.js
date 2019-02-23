@@ -16,6 +16,7 @@ class ProfileTab extends Component{
     }
   }
 
+
   componentDidMount(){
     //get logged-in user
     var loginFile = require('./Login');
