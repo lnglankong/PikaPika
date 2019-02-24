@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, Platform } from 'react-native';
+import { StyleSheet, Text, View, Image, Platform, Button,TouchableOpacity} from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer, HeaderBackButton } from 'react-navigation'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SearchBar } from 'react-native-elements';
 
 import AddMediaTab from './AddMediaTab'
 import HomeTab from './HomeTab'
@@ -19,6 +19,35 @@ export default class Main extends React.Component {
     );
   }
 }
+
+class MySearchBar extends React.Component {
+  state = {
+    search: '',
+  };
+
+  updateSearch = search => {
+    this.setState({ search });
+  };
+
+  render() {
+    const { search } = this.state;
+
+    return (
+      <SearchBar
+       // placeholder="Type Here..."
+        onChangeText={this.updateSearch}
+        value={search}
+        containerStyle = {{width: '100%'}}
+        inputStyle={{backgroundColor: 'white'}}
+        lightTheme = "true"
+       // containerStyle={{backgroundColor: 'white', borderWidth: 1, borderRadius: 15, width: '100%', height:'100%'}}
+        placeholder={'Pritish Vaidya'}
+      />
+    );
+  }
+}
+
+
 
 const navigationOptionsEditProfile = ({ navigation }) => ({
     headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
@@ -63,31 +92,68 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
   {
     HomeTab:{
       screen: HomeTab,
-      navigationOptions: {// options for header
+      navigationOptions: ({ navigation, screenProps }) => ({// options for header
         title: 'Home',
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
         headerTitleStyle: { alignSelf: 'center', flex:1 },
-      }
-    }
-  }
-));
+        headerRight: (
+          <TouchableOpacity
+            onPress={() =>navigation.navigate('SearchTab')}>
+            <Image
+              style = {{width:41, height:41}}
+              source={require('./assets/images/search.png')}
+            />
+         </TouchableOpacity>
+        ),
+      })
+    },
 
-const SearchTabStackNavigator = createAppContainer(createStackNavigator(
-  {
     SearchTab:{
+      
       screen: SearchTab,
-      navigationOptions: {// options for header
-        title: 'Search',
+      navigationOptions:({navigation}) =>( {// options for header
+        headerTitle:      
+          <MySearchBar/>,
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
         headerTitleStyle: { alignSelf: 'center', flex:1 },
-      }
+        headerLeft:(
+          <Image
+            style = {{width:41, height:41}}
+            source={require('./assets/images/search_colored.png')}
+          />
+        ),
+        headerRight:(
+          <Button 
+            title = "cancel"
+            color = "#808080"
+            onPress={() => navigation.goBack(null)}
+          />
+        )
+
+      })
     }
+
   }
 ));
+
+// const SearchTabStackNavigator = createAppContainer(createStackNavigator(
+//   {
+//     SearchTab:{
+//       screen: SearchTab,
+//       navigationOptions: {// options for header
+//         title: 'Search',
+//         headerStyle: {
+//           backgroundColor:'#FFB6C1',
+//         },
+//         headerTitleStyle: { alignSelf: 'center', flex:1 },
+//       }
+//     }
+//   }
+// ));
 
 const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
   {
