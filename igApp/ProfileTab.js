@@ -23,7 +23,7 @@ class ProfileTab extends Component{
 
     //get reference to the logged in user from database
     const userRef = rootRef.child('Users/' + loginFile.loggedInUser);
-  
+
     userRef.on("value", (childSnapshot) => {
       this.setState({
         displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name, //set displayName to "Thomas Munduchira"

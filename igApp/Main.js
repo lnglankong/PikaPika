@@ -9,6 +9,7 @@ import LikesTab from './LikesTab'
 import ProfileTab from './ProfileTab'
 import SearchTab from './SearchTab'
 import EditProfile from './EditProfile'
+import ViewComment from './ViewComment'
 
 export default class Main extends React.Component {
 
@@ -37,11 +38,14 @@ class MySearchBar extends React.Component {
        // placeholder="Type Here..."
         onChangeText={this.updateSearch}
         value={search}
-        containerStyle = {{width: '100%'}}
+       // containerStyle = {{width: '100%'}}
         inputStyle={{backgroundColor: 'white'}}
-        lightTheme = "true"
-       // containerStyle={{backgroundColor: 'white', borderWidth: 1, borderRadius: 15, width: '100%', height:'100%'}}
-        placeholder={'Pritish Vaidya'}
+        //lightTheme = {true}
+        searchIcon={<View />}
+        inputContainerStyle={{backgroundColor: 'white', width: '100%', height:'90%', flex:1, marginTop:-1}}
+        containerStyle={{backgroundColor: 'white', borderWidth: 1.5, borderRadius: 15, width: '100%', height:'95%'}}
+        placeholder={'Search'}
+        keyboardType = {'web-search'}
       />
     );
   }
@@ -50,6 +54,10 @@ class MySearchBar extends React.Component {
 
 
 const navigationOptionsEditProfile = ({ navigation }) => ({
+    headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
+})
+
+const navigationOptionsViewComment = ({ navigation }) => ({
     headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
 })
 
@@ -83,7 +91,7 @@ const LikesTabStackNavigator = createAppContainer(createStackNavigator(
           backgroundColor:'#FFB6C1',
         },
         headerTitleStyle: { alignSelf: 'center', flex:1 },
-      } 
+      }
     }
   }
 ));
@@ -110,8 +118,12 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
       })
     },
 
+    ViewComment:{ // show comments of a post
+      screen: ViewComment,
+      navigationOptionsViewComment
+    },
+
     SearchTab:{
-      
       screen: SearchTab,
       navigationOptions:({navigation}) =>( {// options for header
         headerTitle:      
@@ -119,10 +131,10 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
-        headerTitleStyle: { alignSelf: 'center', flex:1 },
+        headerTitleStyle: { alignSelf: 'auto' },
         headerLeft:(
           <Image
-            style = {{width:41, height:41}}
+            style = {{width:41, height:41,marginLeft:8}}
             source={require('./assets/images/search_colored.png')}
           />
         ),
@@ -131,6 +143,7 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
             title = "cancel"
             color = "#808080"
             onPress={() => navigation.goBack(null)}
+            titleStyle ={ {fontFamily: "Noteworthy"}}
           />
         )
 
@@ -177,7 +190,7 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
           screen: HomeTabStackNavigator,
           navigationOptions: {
             tabBarIcon: ({focused}) => ( // insert image for the home button
-              <Image style={{ width: 58, height: 58 }} 
+              <Image style={{ width: 58, height: 58 }}
                      source={focused? require('./assets/images/house_colored.png'): require('./assets/images/house.png')} />
             )
           }
@@ -192,7 +205,7 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
           screen: AddMediaTabStackNavigator,
           navigationOptions: {
             tabBarIcon: ({focused}) =>(
-              focused? 
+              focused?
             <Image style={{ width: 54, height: 54 }} source={require('./assets/images/camera_colored.png')} />:
             <Image style={{ width: 54, height: 54 }} source={require('./assets/images/camera.png')} />
             )}
@@ -207,10 +220,10 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
           screen: ProfileTabStackNavigator,
 
           navigationOptions: {
-            tabBarIcon: ({focused}) => 
-              <Image style={{ width: 54, height: 54 }} 
+            tabBarIcon: ({focused}) =>
+              <Image style={{ width: 54, height: 54 }}
                     source={focused? require('./assets/images/profile_colored.png'):require('./assets/images/profile.png')} />,
-            
+
           }
       }
 

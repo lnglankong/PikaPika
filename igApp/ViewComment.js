@@ -1,17 +1,22 @@
 import React, {Component} from "react";
 import {View, Text, StyleSheet} from "react-native";
 
-class SearchTab extends Component{
+import firebase from './Firebase.js'
+
+//The reference to the root of the database
+const rootRef = firebase.database().ref();
+
+class ViewComment extends Component{
   render(){
     return(
-      <View style = {styles.container}>
-        <Text>SearchTab</Text>
+      <View style={styles.container}>
+        <Text>ViewComment</Text>
       </View>
     )
   }
 }
 
-export default SearchTab
+export default ViewComment
 
 const styles = StyleSheet.create({
     container: {
