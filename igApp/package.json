@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "expo": "^32.0.6",
+    "expo-activity-feed": "^0.8.8",
     "expo-firebase-analytics": "^2.0.0",
     "expo-firebase-app": "^2.0.0",
     "expo-firebase-auth": "^2.0.0",
