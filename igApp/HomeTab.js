@@ -20,6 +20,7 @@ import update from 'immutability-helper';
 const rootRef = firebase.database().ref();
 
 class HomeTab extends Component{
+
   state = {
     loaded: false,
     data: null,
@@ -35,6 +36,8 @@ class HomeTab extends Component{
     //get logged-in user
     var loginFile = require('./Login');
 
+    var usersFollowed = [];
+
     firebase.database().ref('Following/' + loginFile.loggedInUser).once('value', (childSnapshot) => {
 
       if(childSnapshot.exists()){ //if user is following people ... get the following IDs
@@ -42,8 +45,11 @@ class HomeTab extends Component{
         let followingKeys = Object.keys(childSnapshot.val());
 
         followingKeys.forEach((currentFollowingUserID) => {
+          usersFollowed.push(currentFollowingUserID);
 
-          this.state.usersFollowed.push(currentFollowingUserID);
+          this.setState({usersFollowed: usersFollowed});
+
+          //console.log("Following: " + currentFollowingUserID);
         })
       }
     })
@@ -52,15 +58,24 @@ class HomeTab extends Component{
 
   getFollowingPosts(){
 
-    firebase.database().ref('PostByUserID/' + this.state.usersFollowed).once('value', (childSnapshot2) => {
+    //console.log("Users Followed: " + this.state.usersFollowed);
 
-      if(childSnapshot2.exists()){ //if following user has posts...get their posts
-        let postByUserIDKeys = Object.keys(childSnapshot2.val());
+    this.state.usersFollowed.forEach((userFollowed) => {
 
-        postByUserIDKeys.forEach((currentPostByUserID) => {
-          this.state.followingPosts.push(currentPostByUserID);
-        })
-      }
+      //console.log("Checking " + userFollowed + " posts");
+
+      firebase.database().ref('PostByUserID/' + userFollowed).once('value', (childSnapshot2) => {
+
+        if(childSnapshot2.exists()){ //if following user has posts...get their posts
+          let postByUserIDKeys = Object.keys(childSnapshot2.val());
+
+          postByUserIDKeys.forEach((currentPostByUserID) => {
+            this.state.followingPosts.push(currentPostByUserID);
+
+            //console.log("Has post: " + currentPostByUserID)
+          })
+        }
+      })
     })
   }
 
@@ -74,49 +89,56 @@ class HomeTab extends Component{
 
       childSnapshot3.forEach((post) => {
 
-        let username = '';
-        let profilePicture = '';
-        let commentsCount = 0;
+        //console.log("checking if includes: " + post.key);
+        if(this.state.followingPosts.includes(post.key)){
 
-        //get username of poster
-        firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot4) => {
-          username = childSnapshot4.val().username;
-        })
 
-        //get profile picture of poster
-        firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot4) => {
-          profilePicture = childSnapshot4.val().profile_picture;
-        })
+          //console.log("Looking for post: " + post.key);
 
-        //get profile picture of poster
-        firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot4) => {
-          //commentsCount = childSnapshot4.numChildren();
-          childSnapshot4.forEach((comment) => {
-            commentsCount++;
+          let username = '';
+          let profilePicture = '';
+          let commentsCount = 0;
+
+          //get username of poster
+          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot4) => {
+            username = childSnapshot4.val().username;
           })
-        })
 
-        feedList.push({
-             caption: post.val().caption,
-             commments: post.val().comments,
-             date: post.val().date,
-             hashtag: post.val().hashtag,
-             likes: post.val().likes,
-             picture: post.val().picture,
-             username: username,
-             profile_picture: profilePicture,
-             commentsCount: commentsCount,
-             likesPicture: require('./assets/images/likeIcon.png'),
-             userLiked: false,
-             postIndex: postCount,
-             key: post.key
-        });
+          //get profile picture of poster
+          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot4) => {
+            profilePicture = childSnapshot4.val().profile_picture;
+          })
 
-        postCount++;
-        console.log("PostCount: " + postCount);
+          //get profile picture of poster
+          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot4) => {
+            //commentsCount = childSnapshot4.numChildren();
+            childSnapshot4.forEach((comment) => {
+              commentsCount++;
+            })
+          })
 
-        this.setState({feedPostsArray: feedList});
-        //console.log("Current postsarray: " + this.state.feedPostsArray);
+          feedList.push({
+               caption: post.val().caption,
+               commments: post.val().comments,
+               date: post.val().date,
+               hashtag: post.val().hashtag,
+               likes: post.val().likes,
+               picture: post.val().picture,
+               username: username,
+               profile_picture: profilePicture,
+               commentsCount: commentsCount,
+               likesPicture: require('./assets/images/likeIcon.png'),
+               userLiked: false,
+               postIndex: postCount,
+               key: post.key
+          });
+
+          postCount++;
+          //console.log("PostCount: " + postCount);
+
+          this.setState({feedPostsArray: feedList});
+          //console.log("Current postsarray: " + this.state.feedPostsArray);
+        }
       })
       //console.log("posts: " + this.state.feedPosts);
     })
@@ -129,15 +151,10 @@ class HomeTab extends Component{
   }
 
   handleLikePress(item){
-
-    console.log("User liked state is " + item.userLiked);
-    console.log("post index is: " + item.postIndex);
-
     //check if user already liked this post
     if(item.userLiked == false){
       item.userLiked = true
 
-      console.log("Pre setstate")
 
       //switch like icon to filled in heart
       this.setState({
@@ -156,12 +173,9 @@ class HomeTab extends Component{
         })
       })
 
-      console.log("pre database");
-
       //update new amount of likes on firebase
       firebase.database().ref("Post/" + item.key).once('value', (snapshot) =>{
         let currentLikes = snapshot.val().likes + 1;
-        console.log("AAHH " + currentLikes);
 
         const postRef = rootRef.child('Post/' + item.key);
         postRef.update({likes: currentLikes});
@@ -200,11 +214,9 @@ class HomeTab extends Component{
       })
 
       //update new amount of likes on firebase
-      console.log("BAHH " + item.key );
       firebase.database().ref("Post/" + item.key).once('value', (snapshot) =>{
 
         let currentLikes = snapshot.val().likes - 1;
-        console.log("AAHH " + currentLikes );
 
         const postRef = rootRef.child('Post/' + item.key);
         postRef.update({likes: currentLikes});
@@ -228,15 +240,19 @@ class HomeTab extends Component{
 
     if(this.state.loaded == false){
       //this.getActivityFeedPosts();
+
       this.getUsersFollowed();
+      await new Promise(resolve => { setTimeout(resolve, 100); });
       this.getFollowingPosts();
+      await new Promise(resolve => { setTimeout(resolve, 100); });
       this.getFeedPosts();
+      await new Promise(resolve => { setTimeout(resolve, 100); });
       this.setSampleProfilePic();
       this.setState({loaded: true});
 
 
       // Sleep for half a second
-      await new Promise(resolve => { setTimeout(resolve, 500); });
+      await new Promise(resolve => { setTimeout(resolve, 100); });
 
       this.setState(this.state.feedPosts);
       //this.setState({feedPostsArray: Object.values(this.state.feedPosts)});
