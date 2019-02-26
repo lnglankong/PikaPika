@@ -110,7 +110,7 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
           <TouchableOpacity
             onPress={() =>navigation.navigate('SearchTab')}>
             <Image
-              style = {{width:41, height:41}}
+              style = {{width:41, height:41, marginRight:8}}
               source={require('./assets/images/search.png')}
             />
          </TouchableOpacity>
@@ -190,38 +190,30 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
           screen: HomeTabStackNavigator,
           navigationOptions: {
             tabBarIcon: ({focused}) => ( // insert image for the home button
-              <Image style={{ width: 58, height: 58 }}
+              <Image style={{ width: 58, height: 58, marginTop:15 }}
                      source={focused? require('./assets/images/house_colored.png'): require('./assets/images/house.png')} />
             )
           }
       },
 
-      // search tab is not necessary in bottom tab bar
-      // SearchTab: {
-      //     screen: SearchTabStackNavigator,
-      // },
 
       AddMediaTab: {
           screen: AddMediaTabStackNavigator,
           navigationOptions: {
             tabBarIcon: ({focused}) =>(
               focused?
-            <Image style={{ width: 54, height: 54 }} source={require('./assets/images/camera_colored.png')} />:
-            <Image style={{ width: 54, height: 54 }} source={require('./assets/images/camera.png')} />
+            <Image style={{ width: 54, height: 54, marginTop:15 }} source={require('./assets/images/camera_colored.png')} />:
+            <Image style={{ width: 54, height: 54, marginTop:15 }} source={require('./assets/images/camera.png')} />
             )}
       },
 
-      // likes tab is not necessary in bottom tab bar
-      // LikesTab: {
-      //     screen: LikesTabStackNavigator,
-      // },
 
       ProfileTab: {
           screen: ProfileTabStackNavigator,
 
           navigationOptions: {
             tabBarIcon: ({focused}) =>
-              <Image style={{ width: 54, height: 54 }}
+              <Image style={{ width: 54, height: 54, marginTop:15 }}
                     source={focused? require('./assets/images/profile_colored.png'):require('./assets/images/profile.png')} />,
 
           }
