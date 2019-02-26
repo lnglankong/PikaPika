@@ -44,7 +44,9 @@ export default class SignUp extends React.Component {
       email,
       'first_name': '',
       'last_name': '',
-      'profile_picture': ''
+      'profile_picture': "https://firebasestorage.googleapis.com/v0/b/ecs165a." +
+                         "appspot.com/o/default_profile_pic.png?alt=media&token" +
+                         "=fd2ec8c0-97a0-4dca-9170-cd6c4bf6efd3"
     })
     //Add username to Username table
     firebase.database().ref('Usernames/').update({[username]: userRef.key });
