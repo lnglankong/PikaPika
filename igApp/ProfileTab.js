@@ -12,17 +12,35 @@ class ProfileTab extends Component{
       //Initialize the state "displayName" to nothing for now
       //we want to eventually print "Hello <displayName>"
       displayName: "",
-      displayBio: ""
+      displayBio: "",
+      followersNum:0,
+      followingNum:0,
+      postsNum:0,
     }
   }
 
 
-  componentDidMount(){
+
+
+  componentWillMount(){
     //get logged-in user
     var loginFile = require('./Login');
 
     //get reference to the logged in user from database
     const userRef = rootRef.child('Users/' + loginFile.loggedInUser);
+    const followingRef = rootRef.child('Following/' + loginFile.loggedInUser);
+    const followerRef = rootRef.child('Followers/' + loginFile.loggedInUser);
+    const postRef = rootRef.child('PostByUserID/' + loginFile.loggedInUser);
+
+
+
+
+    //   followingRef.child("Following").onWrite(event => {
+    //     return event.data.ref.parent.once("value", (snapshot) => {
+    //       const count = snapshot.numChildren();
+    //       return event.data.ref.update({ count });
+    //     });
+    // })
 
     userRef.on("value", (childSnapshot) => {
       this.setState({
@@ -30,6 +48,21 @@ class ProfileTab extends Component{
         profilePicture: childSnapshot.val().profile_picture,
         displayBio: childSnapshot.val().biography
       })
+    })
+
+    followingRef.on("value", (snapshot) => {
+       // console.log("There are "+snapshot.numChildren()+" messages");
+        this.setState({followingNum:snapshot.numChildren() })
+    })
+
+    followerRef.on("value", (snapshot) => {
+        // console.log("There are "+snapshot.numChildren()+" messages");
+        this.setState({followersNum:snapshot.numChildren() })
+    })
+
+    postRef.on("value", (snapshot) => {
+        // console.log("There are "+snapshot.numChildren()+" messages");
+        this.setState({postsNum:snapshot.numChildren() })
     })
   }
 
@@ -61,15 +94,15 @@ class ProfileTab extends Component{
                     marginLeft:10
                 }}>
                 <View style={{ alignItems: 'center' }}>
-                    <Text>20</Text>
+                    <Text>{this.state.postsNum}</Text>
                     <Text style={{ fontSize: 15, color: 'grey',fontFamily:"Noteworthy" }}>Posts</Text>
                 </View>
                 <View style={{ alignItems: 'center' }}>
-                    <Text>205</Text>
+                    <Text>{this.state.followersNum}</Text>
                     <Text style={{ fontSize: 15, color: 'grey',fontFamily:"Noteworthy" }}>Followers</Text>
                 </View>
                 <View style={{ alignItems: 'center' }}>
-                    <Text>167</Text>
+                    <Text>{this.state.followingNum}</Text>
                     <Text style={{ fontSize: 15, color: 'grey',fontFamily:"Noteworthy" }}>Following</Text>
                 </View>
             </View>
