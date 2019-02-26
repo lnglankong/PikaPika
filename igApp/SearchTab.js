@@ -94,14 +94,14 @@ class SearchTab extends Component {
           source={require('./assets/images/search_colored.png')}
         />
       )
-      // headerRight:(
-      //   <Button
-      //     title = "cancel"
-      //     color = "#808080"
-      //     onPress={() => navigation.goBack(null)}
-      //     titleStyle ={ {fontFamily: "Noteworth"}}
-      //   />
-      // )
+      headerRight:(
+        <Button
+          title = "cancel"
+          color = "#808080"
+          onPress={() => navigation.goBack(null)}
+          titleStyle ={ {fontFamily: "Noteworth"}}
+        />
+      )
     }
   };
 
