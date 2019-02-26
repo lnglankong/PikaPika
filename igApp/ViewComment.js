@@ -7,6 +7,9 @@ import firebase from './Firebase.js'
 const rootRef = firebase.database().ref();
 
 class ViewComment extends Component{
+
+  //snapshot of comments is stored in prop commentsObject
+  
   render(){
     return(
       <View style={styles.container}>
