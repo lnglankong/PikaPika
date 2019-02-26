@@ -143,7 +143,7 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
             title = "cancel"
             color = "#808080"
             onPress={() => navigation.goBack(null)}
-            titleStyle ={ {fontFamily: "Noteworthy"}}
+            titleStyle ={ {fontFamily: "Noteworth"}}
           />
         )
 
