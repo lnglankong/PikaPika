@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, Text, Image, StyleSheet, FlatList} from "react-native";
+import {View, Text, Image, StyleSheet, FlatList, TouchableOpacity} from "react-native";
 import {SearchBar, ListItem} from 'react-native-elements';
 
 import firebase from './Firebase.js'
@@ -89,18 +89,21 @@ class SearchTab extends Component {
       },
       headerTitleStyle: { alignSelf: 'auto' },
       headerLeft:(
-        <Image
-          style = {{width:41, height:41,marginLeft:8}}
-          source={require('./assets/images/search_colored.png')}
-        />
-      )
+       // <HeaderBackButton onPress={() => navigation.goBack(null)}/>
+       <Image
+       style = {{width:41, height:41,marginLeft:8, marginBottom:8}}
+       source={require('./assets/images/search_colored.png')}
+     />
+      ),
       headerRight:(
-        <Button
-          title = "cancel"
-          color = "#808080"
-          onPress={() => navigation.goBack(null)}
-          titleStyle ={ {fontFamily: "Noteworth"}}
+        <TouchableOpacity
+        onPress={() =>navigation.goBack(null)}>
+        <Image
+          style = {{width:20, height:20, marginRight:15,marginBottom:5}}
+          source={require('./assets/images/cancel.png')}
         />
+     </TouchableOpacity>
+      
       )
     }
   };
