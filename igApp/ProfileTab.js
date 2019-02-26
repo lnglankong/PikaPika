@@ -84,8 +84,8 @@ class ProfileTab extends Component{
 
     <View style={{ marginTop:10, paddingBottom: 10 }}>
         <View style={{ paddingHorizontal: 10 }}>
-            <Text style={{ fontWeight: 'bold' }}>Zekai Zhao</Text>
-            <Text>I love Pika Pika</Text>
+            <Text style={{ fontWeight: 'bold' }}>{this.state.displayName}</Text>
+            <Text>{this.state.displayBio}</Text>
         </View>
     </View>
 </View>
