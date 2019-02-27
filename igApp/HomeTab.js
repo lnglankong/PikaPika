@@ -28,6 +28,7 @@ class HomeTab extends Component{
     followingPosts: [],
     feedPosts: [],
     feedPostsArray: [],
+    isFetching: false,
     SampleProfilePic: ''
   }
 
@@ -151,6 +152,26 @@ class HomeTab extends Component{
     firebase.database().ref('Users/userID1').on('value', (childSnapshot) => {
       this.setState({SampleProfilePic: childSnapshot.val().profile_picture});
     })
+  }
+
+  async onRefresh(){
+    console.log("Attempting to refresh");
+    this.setState({isFetching: true})
+    this.getUsersFollowed();
+    await new Promise(resolve => { setTimeout(resolve, 100); });
+    this.getFollowingPosts();
+    await new Promise(resolve => { setTimeout(resolve, 100); });
+    this.getFeedPosts();
+    await new Promise(resolve => { setTimeout(resolve, 100); });
+    this.setSampleProfilePic();
+    this.setState({loaded: true});
+
+
+    // Sleep for half a second
+    await new Promise(resolve => { setTimeout(resolve, 100); });
+
+    this.setState(this.state.feedPosts);
+    this.setState({isFetching: false});
   }
 
   handleLikePress(item){
@@ -279,9 +300,11 @@ class HomeTab extends Component{
   render(){
 
     return(
-      <ScrollView>
+
           <FlatList
             data = {this.state.feedPostsArray}
+            onRefresh={async () => this.onRefresh()}
+            refreshing={this.state.isFetching}
             renderItem={({item}) =>
               <View>
                 <Card style={{ height: 610 }}>
@@ -340,7 +363,7 @@ class HomeTab extends Component{
             /*  { this.renderCard*/
             keyExtractor={(item, index) => this.state.feedPostsArray[index].key}
           />
-      </ScrollView>
+
     )
   }
 
