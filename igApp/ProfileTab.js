@@ -350,7 +350,7 @@ class ProfileTab extends Component{
                 </CardItem>
 
                 <CardItem cardBody>
-                  <Image source={{uri: item.picture}} style={{ height: 400, width: null, flex: 1 }} />
+                  <Image source={{uri: item.picture}} style={{ height: 400, width: null, flex: 1 ,borderRadius: 20}} />
                 </CardItem>
 
                 <CardItem style={{ height: 60 }}>
