@@ -32,7 +32,8 @@ class AddMediaTab extends Component{
       'userID': this.state.userID
     })
 
-    //TODO: Add post to PostByUserID table
+    //add post to PostByUserID table
+    firebase.database().ref().child('PostByUserID/' + this.state.userID + '/' + postID.key).set(true);
   }
 
   //choose a picture from user's camera roll to upload
