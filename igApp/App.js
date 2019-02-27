@@ -6,13 +6,21 @@ import MainStackNavigator from './MainStackNavigator'
 
 import { createSwitchNavigator, createAppContainer } from 'react-navigation'
 
-const App = createAppContainer(createSwitchNavigator (
+export const App = createAppContainer(createSwitchNavigator (
   {
-    Loading,
-    Login,
-    SignUp,
-    MainStackNavigator,
-    Main
+    Loading:{
+      screen:Loading
+    },
+    Login:{
+      screen: Login
+    },
+    SignUp:{
+      screen:SignUp
+    },
+   // MainStackNavigator,
+    Main:{
+      screen:Main
+    }
   },
   {
     initialRouteName: 'Loading'

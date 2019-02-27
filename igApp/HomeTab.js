@@ -295,6 +295,7 @@ class HomeTab extends Component{
             onRefresh={async () => this.onRefresh()}
             refreshing={this.state.isFetching}
             renderItem={({item}) =>
+              
               <View>
                 <Card style={{ height: 610 }}>
                   <CardItem>
@@ -340,6 +341,7 @@ class HomeTab extends Component{
                     <Body>
                       <TouchableOpacity onPress={() => this.props.navigation.navigate('ViewComment', {
                         commentsObject: item.comments,
+                        postID: item.key
                       })}>
                         <Text>{"View " + item.commentsCount + " comments"} </Text>
                       </TouchableOpacity>
