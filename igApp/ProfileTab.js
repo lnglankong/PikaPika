@@ -19,8 +19,10 @@ class ProfileTab extends Component{
       followersNum:0,
       followingNum:0,
       postsByID: [],
+      isFetching: false,
       posts: [],
       postsNum:0,
+      currentUser: '',
       follow:"Follow"
     }
   }
@@ -70,6 +72,19 @@ class ProfileTab extends Component{
         this.setState({follow:"Follow"})
 
     })
+  }
+
+  async onRefresh(userID){
+    console.log("profile tab Attempting to refresh");
+    this.setState({isFetching: true})
+
+    this.getPostsByUserID(userID)
+    this.getFeedPosts()
+    await new Promise(resolve => { setTimeout(resolve, 200); });
+
+    // Sleep for half a second
+    await new Promise(resolve => { setTimeout(resolve, 200); });
+    this.setState({isFetching: false});
   }
 
 
@@ -192,7 +207,7 @@ class ProfileTab extends Component{
         })
 
         this.getPostsByUserID(loginFile.loggedInUser);
-        await new Promise(resolve => { setTimeout(resolve, 100); });
+        await new Promise(resolve => { setTimeout(resolve, 200); });
 
     }
     else{
@@ -244,13 +259,15 @@ class ProfileTab extends Component{
          })
          })
 
+         this.setState({currentUser: userId});
+
          this.getPostsByUserID(userId)
-         await new Promise(resolve => { setTimeout(resolve, 100); });
+         await new Promise(resolve => { setTimeout(resolve, 200); });
 
     }
 
     this.getFeedPosts();
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
   }
 
   render(){
@@ -315,9 +332,10 @@ class ProfileTab extends Component{
             </View>
         </View>
 
-        <ScrollView>
           <FlatList
             data = {this.state.posts}
+            onRefresh={async () => this.onRefresh(this.state.currentUser)}
+            refreshing={this.state.isFetching}
             renderItem={({item}) =>
             <View>
               <Card style={{ height: 610 }}>
@@ -325,8 +343,8 @@ class ProfileTab extends Component{
                   <Left>
                       <Thumbnail source={{uri: item.profile_picture}} />
                       <Body>
-                          <Text>{item.username} </Text>
-                          <Text note>Jan 15, 2018</Text>
+                          <Text style={{ fontWeight: "900" }}>{item.username} </Text>
+                          <Text note>{item.date}</Text>
                       </Body>
                   </Left>
                 </CardItem>
@@ -375,7 +393,6 @@ class ProfileTab extends Component{
           }
             keyExtractor={(item, index) => this.state.posts[index].key}
           />
-        </ScrollView>
     </View>
 
     )
