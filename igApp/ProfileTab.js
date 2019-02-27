@@ -216,52 +216,53 @@ class ProfileTab extends Component{
          rootRef.child('Usernames/'+this.params.username).on("value",(snapshot) => {
             userId = snapshot.val();
          //   console.log(this.params.username)
-            //console.log(userId)
+            console.log(userId)
             //get reference to the logged in user from database
 
 
 
 
-         const userRef = rootRef.child('Users/' + userId);
-         const followingRef = rootRef.child('Following/' + userId);
-         const followerRef = rootRef.child('Followers/' + userId);
-         const postRef = rootRef.child('PostByUserID/' + userId);
+             const userRef = rootRef.child('Users/' + userId);
+             const followingRef = rootRef.child('Following/' + userId);
+             const followerRef = rootRef.child('Followers/' + userId);
+             const postRef = rootRef.child('PostByUserID/' + userId);
 
-         rootRef.child('Following/' + loginFile.loggedInUser +'/'+userId).once("value",snapshot => {
-            if (snapshot.exists()){
-                this.setState({follow: 'Unfollow'});
-                //console.log("login user is following this user!");
-            }else{
-                this.setState({follow: 'Follow'});
-                //console.log("login user is not following this user!");
-            }
-        }); // check if login user is following this user
+             rootRef.child('Following/' + loginFile.loggedInUser +'/'+userId).once("value",snapshot => {
+                if (snapshot.exists()){
+                    this.setState({follow: 'Unfollow'});
+                    //console.log("login user is following this user!");
+                }else{
+                    this.setState({follow: 'Follow'});
+                    //console.log("login user is not following this user!");
+                }
+            }); // check if login user is following this user
 
-         userRef.on("value", (childSnapshot) => {
-           //  if(childSnapshot.exists()){
-         this.setState({
-             displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name,
-             profilePicture: childSnapshot.val().profile_picture,
-             displayBio: childSnapshot.val().biography
-         })//}
+             userRef.on("value", (childSnapshot) => {
+               //  if(childSnapshot.exists()){
+             this.setState({
+                 displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name,
+                 profilePicture: childSnapshot.val().profile_picture,
+                 displayBio: childSnapshot.val().biography
+             })//}
+             })
+
+             followingRef.on("value", (snapshot) => {
+                 this.setState({followingNum:snapshot.numChildren() })
+             })
+
+             followerRef.on("value", (snapshot) => {
+                 this.setState({followersNum:snapshot.numChildren() })
+             })
+
+             postRef.on("value", (snapshot) => {
+                 this.setState({postsNum:snapshot.numChildren() })
+             })
+             this.setState({currentUser: userId});
+
+             this.getPostsByUserID(userId)
          })
 
-         followingRef.on("value", (snapshot) => {
-             this.setState({followingNum:snapshot.numChildren() })
-         })
 
-         followerRef.on("value", (snapshot) => {
-             this.setState({followersNum:snapshot.numChildren() })
-         })
-
-         postRef.on("value", (snapshot) => {
-             this.setState({postsNum:snapshot.numChildren() })
-         })
-         })
-
-         this.setState({currentUser: userId});
-
-         this.getPostsByUserID(userId)
          await new Promise(resolve => { setTimeout(resolve, 200); });
 
     }
