@@ -81,6 +81,8 @@ class HomeTab extends Component{
 
   getFeedPosts(){
     //Get the all the posts from the current postID
+
+    //console.log("called");
     firebase.database().ref('Post/').orderByChild('date').once('value', (childSnapshot3) => {
       //this.state.feedPosts.push(post);
       var feedList = [];
@@ -90,10 +92,11 @@ class HomeTab extends Component{
       childSnapshot3.forEach((post) => {
 
         //console.log("checking if includes: " + post.key);
+
         if(this.state.followingPosts.includes(post.key)){
 
 
-          //console.log("Looking for post: " + post.key);
+          console.log("Looking for post: " + post.key);
 
           let username = '';
           let profilePicture = '';
@@ -237,6 +240,7 @@ class HomeTab extends Component{
   }
 
   async componentDidMount(){
+    //console.log("STATE IS: " + this.state.loaded);
 
     if(this.state.loaded == false){
       //this.getActivityFeedPosts();
@@ -310,7 +314,7 @@ class HomeTab extends Component{
                     </Body>
                   </CardItem>
 
-                  <CardItem style={{ height: 30 }}>
+                  <CardItem style={{ height: 1, flex: 1 }}>
                     <Body>
                       <Text>
                         <Text style={{ fontWeight: "900" }}>{item.username + " "}
@@ -320,7 +324,7 @@ class HomeTab extends Component{
                     </Body>
                   </CardItem>
 
-                  <CardItem style={{ height: 30 }}>
+                  <CardItem style={{ height: 1, flex: 1}}>
                     <Body>
                       <TouchableOpacity onPress={() => this.props.navigation.navigate('ViewComment', {
                         commentsObject: item.comments,

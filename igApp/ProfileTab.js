@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView} from "react-native";
+import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList} from "react-native";
 import { Card, CardItem, Thumbnail, Body, Left, Right, Button, Icon } from 'native-base';
 import firebase from './Firebase';
 
@@ -18,6 +18,8 @@ class ProfileTab extends Component{
       displayBio: "",
       followersNum:0,
       followingNum:0,
+      postsByID: [],
+      posts: [],
       postsNum:0,
       follow:"Follow"
     }
@@ -40,14 +42,14 @@ class ProfileTab extends Component{
 
     var userId
     var followerRef
-    
+
     rootRef.child('Usernames/'+this.params.username).on("value",(snapshot) => {
         userId = snapshot.val();
         followerRef = rootRef.child('Followers/' + userId);
         followingRef.update({[userId]: true });
         followerRef.update({[loginFile.loggedInUser]:true})
         this.setState({follow:"Unfollow"})
-        
+
     })
   }
 
@@ -59,20 +61,104 @@ class ProfileTab extends Component{
 
     var userId
     var followerRef
-    
+
     rootRef.child('Usernames/'+this.params.username).on("value",(snapshot) => {
         userId = snapshot.val();
         followerRef = rootRef.child('Followers/' + userId);
         followingRef.update({[userId]: null });
         followerRef.update({[loginFile.loggedInUser]:null})
         this.setState({follow:"Follow"})
-        
+
+    })
+  }
+
+
+  getPostsByUserID(userID){
+
+    firebase.database().ref('PostByUserID/' + userID).once('value', (childSnapshot) => {
+
+      if(childSnapshot.exists()){ //if following user has posts...get their posts
+        let postByUserIDKeys = Object.keys(childSnapshot.val());
+
+        postByUserIDKeys.forEach((currentPostByUserID) => {
+          this.state.postsByID.push(currentPostByUserID);
+
+          //console.log("Has post: " + currentPostByUserID)
+        })
+      }
+    })
+
+
+  }
+
+  getFeedPosts(){
+    //Get the all the posts from the current postID
+    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+      //this.state.feedPosts.push(post);
+      var feedList = [];
+
+      let postCount = 0;
+
+      snapshot.forEach((post) => {
+
+        console.log("profile tab checking if includes: " + post.key);
+        if(this.state.postsByID.includes(post.key)){
+
+
+          console.log("profile tab Looking for post: " + post.key);
+
+          let username = '';
+          let profilePicture = '';
+          let commentsCount = 0;
+
+          //get username of poster
+          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
+            username = childSnapshot.val().username;
+          })
+
+          //get profile picture of poster
+          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
+            profilePicture = childSnapshot.val().profile_picture;
+          })
+
+          //get profile picture of poster
+          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
+            //commentsCount = childSnapshot4.numChildren();
+            childSnapshot.forEach((comment) => {
+              commentsCount++;
+            })
+          })
+
+          feedList.push({
+               caption: post.val().caption,
+               commments: post.val().comments,
+               date: post.val().date,
+               hashtag: post.val().hashtag,
+               likes: post.val().likes,
+               picture: post.val().picture,
+               username: username,
+               profile_picture: profilePicture,
+               commentsCount: commentsCount,
+               likesPicture: require('./assets/images/likeIcon.png'),
+               userLiked: false,
+               postIndex: postCount,
+               key: post.key
+          });
+
+          postCount++;
+          //console.log("PostCount: " + postCount);
+
+          this.setState({posts: feedList});
+          console.log("profile tab Current postsarray: " + this.state.posts);
+        }
+      })
+      //console.log("posts: " + this.state.feedPosts);
     })
   }
 
 
 
-  componentWillMount(){
+  async componentWillMount(){
 
     if (this.params == null){ // if the profile is for the login user
         //get logged-in user
@@ -85,11 +171,11 @@ class ProfileTab extends Component{
         const postRef = rootRef.child('PostByUserID/' + loginFile.loggedInUser);
 
         userRef.on("value", (childSnapshot) => {
-        this.setState({
-            displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name, 
-            profilePicture: childSnapshot.val().profile_picture,
-            displayBio: childSnapshot.val().biography
-        })
+          this.setState({
+              displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name,
+              profilePicture: childSnapshot.val().profile_picture,
+              displayBio: childSnapshot.val().biography,
+          })
         })
 
 
@@ -104,6 +190,10 @@ class ProfileTab extends Component{
         postRef.on("value", (snapshot) => {
             this.setState({postsNum:snapshot.numChildren() })
         })
+
+        this.getPostsByUserID(loginFile.loggedInUser);
+        await new Promise(resolve => { setTimeout(resolve, 100); });
+
     }
     else{
         var loginFile = require('./Login');
@@ -114,14 +204,14 @@ class ProfileTab extends Component{
             console.log(userId)
             //get reference to the logged in user from database
 
-        
+
 
 
          const userRef = rootRef.child('Users/' + userId);
          const followingRef = rootRef.child('Following/' + userId);
          const followerRef = rootRef.child('Followers/' + userId);
          const postRef = rootRef.child('PostByUserID/' + userId);
-            
+
          rootRef.child('Following/' + loginFile.loggedInUser +'/'+userId).once("value",snapshot => {
             if (snapshot.exists()){
                 this.setState({follow: 'Unfollow'});
@@ -130,33 +220,37 @@ class ProfileTab extends Component{
                 this.setState({follow: 'Follow'});
                 console.log("login user is not following this user!");
             }
-        }); // check if login user is following this user 
+        }); // check if login user is following this user
 
          userRef.on("value", (childSnapshot) => {
            //  if(childSnapshot.exists()){
          this.setState({
-             displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name, 
+             displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name,
              profilePicture: childSnapshot.val().profile_picture,
              displayBio: childSnapshot.val().biography
          })//}
          })
- 
+
          followingRef.on("value", (snapshot) => {
              this.setState({followingNum:snapshot.numChildren() })
          })
- 
+
          followerRef.on("value", (snapshot) => {
              this.setState({followersNum:snapshot.numChildren() })
          })
- 
+
          postRef.on("value", (snapshot) => {
              this.setState({postsNum:snapshot.numChildren() })
          })
          })
 
+         this.getPostsByUserID(userId)
+         await new Promise(resolve => { setTimeout(resolve, 100); });
 
-         
     }
+
+    this.getFeedPosts();
+    await new Promise(resolve => { setTimeout(resolve, 100); });
   }
 
   render(){
@@ -199,13 +293,13 @@ class ProfileTab extends Component{
                         </View>
                     </View>
                     {this.params?// check if it is other's profile tab
-                            <TouchableOpacity style={styles.editBackground} onPress={this.handleFollow}> 
-                                <Text style={{color: "black",textAlign:'center', fontFamily:'Chalkboard SE'}}> 
+                            <TouchableOpacity style={styles.editBackground} onPress={this.handleFollow}>
+                                <Text style={{color: "black",textAlign:'center', fontFamily:'Chalkboard SE'}}>
                                     {this.state.follow}
                                 </Text>
                             </TouchableOpacity>:
-                        <TouchableOpacity style={styles.editBackground} onPress={() => this.props.navigation.navigate('EditProfile')}> 
-                            <Text style={{color: "black",textAlign:'center', fontFamily:'Chalkboard SE'}}> 
+                        <TouchableOpacity style={styles.editBackground} onPress={() => this.props.navigation.navigate('EditProfile')}>
+                            <Text style={{color: "black",textAlign:'center', fontFamily:'Chalkboard SE'}}>
                                 Edit Profile
                             </Text>
                         </TouchableOpacity>}
@@ -222,50 +316,68 @@ class ProfileTab extends Component{
         </View>
 
         <ScrollView>
-            <Card>
-                    <CardItem>
-                        <Left>
-                            <Thumbnail source={{uri: this.state.profilePicture}} />
-                            <Body>
-                                <Text>{this.state.displayName} </Text>
-                                <Text note>Jan 15, 2018</Text>
-                            </Body>
-                        </Left>
-                    </CardItem>
-                    <CardItem cardBody>
-                        <Image source={{uri: this.state.profilePicture}} style={{ height: 200, width: null, flex: 1 }} />
-                    </CardItem>
-                    <CardItem style={{ height: 45 }}>
-                        <Left>
-                            {/* <Button transparent>
-                                <Icon name="ios-heart-outline" style={{ color: 'black' }} />
-                            </Button>
-                            <Button transparent>
-                                <Icon name="ios-chatbubbles-outline" style={{ color: 'black' }} />
-                            </Button>
-                            <Button transparent>
-                                <Icon name="ios-send-outline" style={{ color: 'black' }} />
-                            </Button> */}
+          <FlatList
+            data = {this.state.posts}
+            renderItem={({item}) =>
+            <View>
+              <Card style={{ height: 610 }}>
+                <CardItem>
+                  <Left>
+                      <Thumbnail source={{uri: item.profile_picture}} />
+                      <Body>
+                          <Text>{item.username} </Text>
+                          <Text note>Jan 15, 2018</Text>
+                      </Body>
+                  </Left>
+                </CardItem>
 
+                <CardItem cardBody>
+                  <Image source={{uri: item.picture}} style={{ height: 400, width: null, flex: 1 }} />
+                </CardItem>
 
-                        </Left>
-                    </CardItem>
+                <CardItem style={{ height: 60 }}>
+                  <Body>
+                    <TouchableOpacity onPress={() => this.handleLikePress(item)}>
+                      <Image
+                      style={{width: 30 , height: 30 ,}}
+                      source={item.likesPicture}
+                      >
+                      </Image>
+                      <Text style={{ fontWeight: "900" }}> {item.likes + " likes"} </Text>
 
-                    <CardItem style={{ height: 20 }}>
-                        <Text>{this.props.likes} likes</Text>
-                    </CardItem>
-                    <CardItem>
-                        <Body>
-                            <Text>
-                                <Text style={{ fontWeight: "900" }}>{this.state.displayName}  </Text>
-                                    hello world!
-                                </Text>
-                        </Body>
-                    </CardItem>
-            </Card>
+                    </TouchableOpacity>
+
+                  </Body>
+                </CardItem>
+
+                <CardItem style={{ height: 1, flex: 1 }}>
+                  <Body>
+                    <Text>
+                      <Text style={{ fontWeight: "900" }}>{item.username + " "}
+                      </Text>
+                      {item.caption}
+                    </Text>
+                  </Body>
+                </CardItem>
+
+                <CardItem style={{ height: 1, flex: 1}}>
+                  <Body>
+                    <TouchableOpacity onPress={() => this.props.navigation.navigate('ViewComment', {
+                      commentsObject: item.comments,
+                    })}>
+                      <Text>{"View " + item.commentsCount + " comments"} </Text>
+                    </TouchableOpacity>
+                  </Body>
+                </CardItem>
+
+              </Card>
+            </View>
+          }
+            keyExtractor={(item, index) => this.state.posts[index].key}
+          />
         </ScrollView>
-    </View> 
-    
+    </View>
+
     )
   }
 
@@ -281,21 +393,21 @@ const styles = StyleSheet.create({
     },
 
     profilePicture:{
-        width: 100, 
-        height: 100, 
-        marginLeft: 10, 
-        borderWidth: 1.5, 
+        width: 100,
+        height: 100,
+        marginLeft: 10,
+        borderWidth: 1.5,
         borderRadius: 50
     },
     editBackground:{
-      flex: 1, 
-      marginLeft: '10%', 
+      flex: 1,
+      marginLeft: '10%',
       marginRight:'10%',
       marginTop:20,
       borderWidth: 1.5,
       borderRadius: 15,
-      justifyContent: 'center', 
-      height: 30 ,  
+      justifyContent: 'center',
+      height: 30 ,
       backgroundColor:"#F7D2F7"
     }
 });
