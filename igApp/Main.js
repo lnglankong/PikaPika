@@ -21,35 +21,35 @@ export default class Main extends React.Component {
   }
 }
 
-class MySearchBar extends React.Component {
-  state = {
-    search: '',
-  };
-
-  updateSearch = search => {
-    this.setState({ search });
-  };
-
-  render() {
-    const { search } = this.state;
-
-    return (
-      <SearchBar
-       // placeholder="Type Here..."
-        onChangeText={this.updateSearch}
-        value={search}
-       // containerStyle = {{width: '100%'}}
-        inputStyle={{backgroundColor: 'white'}}
-        //lightTheme = {true}
-        searchIcon={<View />}
-        inputContainerStyle={{backgroundColor: 'white', width: '100%', height:'90%', flex:1, marginTop:-1}}
-        containerStyle={{backgroundColor: 'white', borderWidth: 1.5, borderRadius: 15, width: '100%', height:'95%'}}
-        placeholder={'Search'}
-        keyboardType = {'web-search'}
-      />
-    );
-  }
-}
+// class MySearchBar extends React.Component {
+//   state = {
+//     search: '',
+//   };
+//
+//   updateSearch = search => {
+//     this.setState({ search });
+//   };
+//
+//   render() {
+//     const { search } = this.state;
+//
+//     return (
+//       <SearchBar
+//        // placeholder="Type Here..."
+//         onChangeText={this.updateSearch}
+//         value={search}
+//        // containerStyle = {{width: '100%'}}
+//         inputStyle={{backgroundColor: 'white'}}
+//         //lightTheme = {true}
+//         searchIcon={false}
+//         inputContainerStyle={{backgroundColor: 'white', width: '100%', height:'90%', flex:1, marginTop:-1}}
+//         containerStyle={{backgroundColor: 'white', borderWidth: 1.5, borderRadius: 15, width: '100%', height:'95%'}}
+//         placeholder={'Search'}
+//         keyboardType = {'web-search'}
+//       />
+//     );
+//   }
+// }
 
 
 
@@ -59,6 +59,15 @@ const navigationOptionsEditProfile = ({ navigation }) => ({
 
 const navigationOptionsViewComment = ({ navigation }) => ({
     headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
+})
+
+const navigationOptionsOtherProfile = ({ navigation }) => ({
+  headerTitleStyle: { alignSelf: 'center', flex:1},
+  headerStyle: {
+    backgroundColor:'#FFB6C1',
+  },
+  headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
+  title: 'Profile',
 })
 
 const ProfileTabStackNavigator = createAppContainer(createStackNavigator(
@@ -124,33 +133,23 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
     },
 
     SearchTab:{
-      screen: SearchTab,
-      navigationOptions:({navigation}) =>( {// options for header
-        headerTitle:      
-          <MySearchBar/>,
-        headerStyle: {
-          backgroundColor:'#FFB6C1',
-        },
-        headerTitleStyle: { alignSelf: 'auto' },
-        headerLeft:(
-          <Image
-            style = {{width:41, height:41,marginLeft:8}}
-            source={require('./assets/images/search_colored.png')}
-          />
-        ),
-        headerRight:(
-          <Button 
-            title = "cancel"
-            color = "#808080"
-            onPress={() => navigation.goBack(null)}
-            titleStyle ={ {fontFamily: "Noteworth"}}
-          />
-        )
+      screen: SearchTab
+      },
 
-      })
+      ProfileTab:{ // view for profile
+        screen: ProfileTab,
+        navigationOptionsOtherProfile,
+        navigationOptions:{
+          headerTitleStyle: { alignSelf: 'center', flex:1},
+          headerStyle: {
+            backgroundColor:'#FFB6C1',
+          },
+          title: 'Profile',
+        }
+      },
     }
 
-  }
+    
 ));
 
 // const SearchTabStackNavigator = createAppContainer(createStackNavigator(
