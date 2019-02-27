@@ -37,7 +37,7 @@ class ProfileTab extends Component{
   }
 
   handleFollowing =() =>{
-    console.log(this.params.username)
+    //console.log(this.params.username)
     var loginFile = require('./Login');
     const followingRef = rootRef.child('Following/' + loginFile.loggedInUser);
 
@@ -56,7 +56,7 @@ class ProfileTab extends Component{
   }
 
   handleUnFollow =() =>{
-    console.log("I am in unfollow")
+    //console.log("I am in unfollow")
     var loginFile = require('./Login');
     const followingRef = rootRef.child('Following/' + loginFile.loggedInUser);
 
@@ -75,7 +75,7 @@ class ProfileTab extends Component{
   }
 
   async onRefresh(userID){
-    console.log("profile tab Attempting to refresh");
+    //console.log("profile tab Attempting to refresh");
     this.setState({isFetching: true})
 
     this.getPostsByUserID(userID)
@@ -116,11 +116,11 @@ class ProfileTab extends Component{
 
       snapshot.forEach((post) => {
 
-        console.log("profile tab checking if includes: " + post.key);
+        //console.log("profile tab checking if includes: " + post.key);
         if(this.state.postsByID.includes(post.key)){
 
 
-          console.log("profile tab Looking for post: " + post.key);
+          //console.log("profile tab Looking for post: " + post.key);
 
           let username = '';
           let profilePicture = '';
@@ -164,7 +164,7 @@ class ProfileTab extends Component{
           //console.log("PostCount: " + postCount);
 
           this.setState({posts: feedList});
-          console.log("profile tab Current postsarray: " + this.state.posts);
+          //console.log("profile tab Current postsarray: " + this.state.posts);
         }
       })
       //console.log("posts: " + this.state.feedPosts);
@@ -216,7 +216,7 @@ class ProfileTab extends Component{
          rootRef.child('Usernames/'+this.params.username).on("value",(snapshot) => {
             userId = snapshot.val();
          //   console.log(this.params.username)
-            console.log(userId)
+            //console.log(userId)
             //get reference to the logged in user from database
 
 
@@ -230,10 +230,10 @@ class ProfileTab extends Component{
          rootRef.child('Following/' + loginFile.loggedInUser +'/'+userId).once("value",snapshot => {
             if (snapshot.exists()){
                 this.setState({follow: 'Unfollow'});
-                console.log("login user is following this user!");
+                //console.log("login user is following this user!");
             }else{
                 this.setState({follow: 'Follow'});
-                console.log("login user is not following this user!");
+                //console.log("login user is not following this user!");
             }
         }); // check if login user is following this user
 
