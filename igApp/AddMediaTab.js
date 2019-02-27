@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Button, Image, Alert, Platform} from "react-native";
+import { View, StyleSheet, Button, Image, Alert, Platform, TextInput, Keyboard, TouchableWithoutFeedback} from "react-native";
 import { ImagePicker, Permissions } from "expo";
 
 import firebase from './Firebase.js'
@@ -8,7 +8,8 @@ class AddMediaTab extends Component{
   state = {
     // TODO: Change this default image later
     userID: "",
-    image: "https://firebasestorage.googleapis.com/v0/b/ecs165a.appspot.com/o/thomas.png?alt=media&token=db4789a0-8dc7-4b71-82a1-233708de941f",
+    caption: "",
+    picture: "https://firebasestorage.googleapis.com/v0/b/ecs165a.appspot.com/o/default_profile_pic.png?alt=media&token=fd2ec8c0-97a0-4dca-9170-cd6c4bf6efd3",
   };
 
   componentDidMount(){
@@ -18,6 +19,20 @@ class AddMediaTab extends Component{
     //get reference to the logged in user from database
     const userRef = firebase.database().ref().child('Users/' + loginFile.loggedInUser);
     this.setState({ userID: userRef.key });
+  }
+
+  //add a new post to the database
+  createPost = async () => {
+    //Add post to Post table with a unique key
+    const postID = firebase.database().ref('Post/').push({
+      'caption': this.state.caption,
+      'date': new Date().toLocaleString(),
+      'likes': 0,
+      'picture': this.state.picture,
+      'userID': this.state.userID
+    })
+
+    //TODO: Add post to PostByUserID table
   }
 
   //choose a picture from user's camera roll to upload
@@ -39,7 +54,7 @@ class AddMediaTab extends Component{
             // upload image using current time as unique photo ID in storage
             const currentTime = Date.now();
             const uploadUrl = await this.uploadImage(uri, currentTime);
-            this.setState({ image: uploadUrl });
+            this.setState({ picture: uploadUrl });
             Alert.alert("Success");
           }
           catch (error) {
@@ -60,7 +75,7 @@ class AddMediaTab extends Component{
           // upload image using current time as unique photo ID in storage
           const currentTime = Date.now();
           const uploadUrl = await this.uploadImage(uri, currentTime);
-          this.setState({ image: uploadUrl });
+          this.setState({ picture: uploadUrl });
           Alert.alert("Success");
         }
         catch (error) {
@@ -82,7 +97,7 @@ class AddMediaTab extends Component{
           // upload image using current time as unique photo ID in storage
           const currentTime = Date.now();
           const uploadUrl = await this.uploadImage(uri, currentTime);
-          this.setState({ image: uploadUrl });
+          this.setState({ picture: uploadUrl });
           Alert.alert("Success");
         }
         catch (error) {
@@ -104,7 +119,7 @@ class AddMediaTab extends Component{
         // upload image using current time as unique photo ID in storage
         const currentTime = Date.now();
         const uploadUrl = await this.uploadImage(uri, currentTime);
-        this.setState({ image: uploadUrl });
+        this.setState({ picture: uploadUrl });
         Alert.alert("Success");
       }
       catch (error) {
@@ -144,12 +159,25 @@ class AddMediaTab extends Component{
 
   render(){
     return(
-      <View style = {styles.container}>
-        <Text>AddMediaTab</Text>
-        <Image style={styles.image} source={{uri: this.state.image}}/>
-        <Button title="Gallery" onPress={this.selectPicture} />
-        <Button title="Camera" onPress={this.takePicture} />
-      </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style = {styles.container}>
+          <Image style={styles.picture} source={{uri: this.state.picture}}/>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Write a caption..."
+            autoCapitalize="none"
+            onChangeText={caption => this.setState({ caption })}
+            value={this.state.caption}
+            multiline={true}
+          />
+          <Button
+            title="Share"
+            onPress={this.createPost}
+          />
+          <Button title="Gallery" onPress={this.selectPicture} />
+          <Button title="Camera" onPress={this.takePicture} />
+        </View>
+      </TouchableWithoutFeedback>
     )
   }
 
@@ -159,13 +187,21 @@ export default AddMediaTab
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        //flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
     },
-    image: {
-      width: 300,
-      height: 300,
+    picture: {
+      width: 320,
+      height: 320,
       backgroundColor: 'gray'
-    }
+    },
+    textInput: {
+      height: 50,
+      width: 320,
+      borderColor: 'black',
+      backgroundColor:'#FFFFFF',
+      borderWidth: 1,
+      marginTop: 10
+    },
 });
