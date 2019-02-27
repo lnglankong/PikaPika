@@ -313,7 +313,7 @@ class HomeTab extends Component{
                         <Thumbnail source={{uri: item.profile_picture}} />
                         <Body>
                             <Text>{item.username} </Text>
-                            <Text note>Jan 15, 2018</Text>
+                            <Text note>{item.date}</Text>
                         </Body>
                     </Left>
                   </CardItem>
