@@ -10,6 +10,7 @@ import ProfileTab from './ProfileTab'
 import SearchTab from './SearchTab'
 import EditProfile from './EditProfile'
 import ViewComment from './ViewComment'
+import Login from './Login'
 
 export default class Main extends React.Component {
 
@@ -61,6 +62,10 @@ const navigationOptionsViewComment = ({ navigation }) => ({
     headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
 })
 
+const navigationOptionsLogout = ({ navigation }) => ({
+  headerRight: <Button title="logout" onPress={() => navigation.navigate('Login')} />,
+})
+
 const navigationOptionsOtherProfile = ({ navigation }) => ({
   headerTitleStyle: { alignSelf: 'center', flex:1},
   headerStyle: {
@@ -74,6 +79,7 @@ const ProfileTabStackNavigator = createAppContainer(createStackNavigator(
   {
     ProfileTab:{ // view for profile
       screen: ProfileTab,
+      navigationOptionsLogout,
       navigationOptions: {
         headerTitleStyle: { alignSelf: 'center', flex:1},
         headerStyle: {
@@ -90,20 +96,6 @@ const ProfileTabStackNavigator = createAppContainer(createStackNavigator(
   }
 ));
 
-const LikesTabStackNavigator = createAppContainer(createStackNavigator(
-  {
-    LikesTab:{
-      screen: LikesTab,
-      navigationOptions: { // options for header
-        title: 'Likes',
-        headerStyle: {
-          backgroundColor:'#FFB6C1',
-        },
-        headerTitleStyle: { alignSelf: 'center', flex:1 },
-      }
-    }
-  }
-));
 
 const HomeTabStackNavigator = createAppContainer(createStackNavigator(
   {
@@ -136,7 +128,7 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
       screen: SearchTab
       },
 
-      ProfileTab:{ // view for profile
+      ProfileTabInSearch:{ // view for profile
         screen: ProfileTab,
         navigationOptionsOtherProfile,
         navigationOptions:{

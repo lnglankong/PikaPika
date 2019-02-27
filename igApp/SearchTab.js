@@ -3,7 +3,6 @@ import {View, Text, Image, StyleSheet, FlatList, TouchableOpacity} from "react-n
 import {SearchBar, ListItem} from 'react-native-elements';
 
 import firebase from './Firebase.js'
-import profileTab from './ProfileTab'
 
 // reference to Users branch
 const usersRef = firebase.database().ref("Users/");
@@ -137,7 +136,7 @@ class SearchTab extends Component {
           <ListItem
             title={item.username}
             subtitle={`${item.firstName} ${item.lastName}`}
-            onPress={() => this.props.navigation.navigate('ProfileTab', { username: item.username })}
+            onPress={() => this.props.navigation.navigate('ProfileTabInSearch', { username: item.username })}
             leftAvatar={{ rounded: true, source: { uri: item.profilePic } }}
             containerStyle={{ borderBottomWidth: 0 }}
           />
