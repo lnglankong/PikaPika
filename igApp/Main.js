@@ -61,6 +61,15 @@ const navigationOptionsViewComment = ({ navigation }) => ({
     headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
 })
 
+const navigationOptionsOtherProfile = ({ navigation }) => ({
+  headerTitleStyle: { alignSelf: 'center', flex:1},
+  headerStyle: {
+    backgroundColor:'#FFB6C1',
+  },
+  headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
+  title: 'Profile',
+})
+
 const ProfileTabStackNavigator = createAppContainer(createStackNavigator(
   {
     ProfileTab:{ // view for profile
@@ -126,7 +135,21 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
     SearchTab:{
       screen: SearchTab
       },
+
+      ProfileTab:{ // view for profile
+        screen: ProfileTab,
+        navigationOptionsOtherProfile,
+        navigationOptions:{
+          headerTitleStyle: { alignSelf: 'center', flex:1},
+          headerStyle: {
+            backgroundColor:'#FFB6C1',
+          },
+          title: 'Profile',
+        }
+      },
     }
+
+    
 ));
 
 // const SearchTabStackNavigator = createAppContainer(createStackNavigator(
