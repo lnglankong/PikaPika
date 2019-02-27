@@ -80,10 +80,10 @@ class ProfileTab extends Component{
 
     this.getPostsByUserID(userID)
     this.getFeedPosts()
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
 
     // Sleep for half a second
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
     this.setState({isFetching: false});
   }
 
@@ -207,7 +207,7 @@ class ProfileTab extends Component{
         })
 
         this.getPostsByUserID(loginFile.loggedInUser);
-        await new Promise(resolve => { setTimeout(resolve, 100); });
+        await new Promise(resolve => { setTimeout(resolve, 200); });
 
     }
     else{
@@ -262,12 +262,12 @@ class ProfileTab extends Component{
          this.setState({currentUser: userId});
 
          this.getPostsByUserID(userId)
-         await new Promise(resolve => { setTimeout(resolve, 100); });
+         await new Promise(resolve => { setTimeout(resolve, 200); });
 
     }
 
     this.getFeedPosts();
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
   }
 
   render(){

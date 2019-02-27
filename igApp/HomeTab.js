@@ -158,17 +158,17 @@ class HomeTab extends Component{
     console.log("Attempting to refresh");
     this.setState({isFetching: true})
     this.getUsersFollowed();
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFollowingPosts();
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFeedPosts();
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
     this.setSampleProfilePic();
     this.setState({loaded: true});
 
 
     // Sleep for half a second
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
 
     this.setState(this.state.feedPosts);
     this.setState({isFetching: false});
