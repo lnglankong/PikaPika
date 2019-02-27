@@ -24,7 +24,7 @@ class HomeTab extends Component{
   state = {
     loaded: false,
     data: null,
-    usersFollowed: [],
+    usersFollowing: [],
     followingPosts: [],
     feedPosts: [],
     feedPostsArray: [],
@@ -32,12 +32,12 @@ class HomeTab extends Component{
     SampleProfilePic: ''
   }
 
-  getUsersFollowed(){
+  getusersFollowing(){
 
     //get logged-in user
     var loginFile = require('./Login');
 
-    var usersFollowed = [];
+    var usersFollowing = [];
 
     firebase.database().ref('Following/' + loginFile.loggedInUser).once('value', (childSnapshot) => {
 
@@ -46,11 +46,10 @@ class HomeTab extends Component{
         let followingKeys = Object.keys(childSnapshot.val());
 
         followingKeys.forEach((currentFollowingUserID) => {
-          usersFollowed.push(currentFollowingUserID);
+          usersFollowing.push(currentFollowingUserID);
 
-          this.setState({usersFollowed: usersFollowed});
+          this.setState({usersFollowing: usersFollowing});
 
-          //console.log("Following: " + currentFollowingUserID);
         })
       }
     })
@@ -59,11 +58,8 @@ class HomeTab extends Component{
 
   getFollowingPosts(){
 
-    //console.log("Users Followed: " + this.state.usersFollowed);
 
-    this.state.usersFollowed.forEach((userFollowed) => {
-
-      //console.log("Checking " + userFollowed + " posts");
+    this.state.usersFollowing.forEach((userFollowed) => {
 
       firebase.database().ref('PostByUserID/' + userFollowed).once('value', (childSnapshot2) => {
 
@@ -72,8 +68,6 @@ class HomeTab extends Component{
 
           postByUserIDKeys.forEach((currentPostByUserID) => {
             this.state.followingPosts.push(currentPostByUserID);
-
-            //console.log("Has post: " + currentPostByUserID)
           })
         }
       })
@@ -83,44 +77,40 @@ class HomeTab extends Component{
   getFeedPosts(){
     //Get the all the posts from the current postID
 
-    //console.log("called");
-    firebase.database().ref('Post/').orderByChild('date').once('value', (childSnapshot3) => {
-      //this.state.feedPosts.push(post);
+    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+
       var feedList = [];
 
       let postCount = 0;
 
-      childSnapshot3.forEach((post) => {
+      snapshot.forEach((post) => {
 
-        //console.log("checking if includes: " + post.key);
-
+        //check if the user is following this post...
         if(this.state.followingPosts.includes(post.key)){
-
-
-          console.log("Looking for post: " + post.key);
 
           let username = '';
           let profilePicture = '';
           let commentsCount = 0;
 
           //get username of poster
-          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot4) => {
-            username = childSnapshot4.val().username;
+          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
+            username = childSnapshot.val().username;
           })
 
           //get profile picture of poster
-          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot4) => {
-            profilePicture = childSnapshot4.val().profile_picture;
+          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
+            profilePicture = childSnapshot.val().profile_picture;
           })
 
           //get profile picture of poster
-          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot4) => {
-            //commentsCount = childSnapshot4.numChildren();
-            childSnapshot4.forEach((comment) => {
+          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
+            //commentsCount = childSnapshot.numChildren();
+            childSnapshot.forEach((comment) => {
               commentsCount++;
             })
           })
 
+          //... get the post information
           feedList.push({
                caption: post.val().caption,
                commments: post.val().comments,
@@ -157,7 +147,7 @@ class HomeTab extends Component{
   async onRefresh(){
     console.log("Attempting to refresh");
     this.setState({isFetching: true})
-    this.getUsersFollowed();
+    this.getusersFollowing();
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFollowingPosts();
     await new Promise(resolve => { setTimeout(resolve, 200); });
@@ -266,7 +256,7 @@ class HomeTab extends Component{
     if(this.state.loaded == false){
       //this.getActivityFeedPosts();
 
-      this.getUsersFollowed();
+      this.getusersFollowing();
       await new Promise(resolve => { setTimeout(resolve, 100); });
       this.getFollowingPosts();
       await new Promise(resolve => { setTimeout(resolve, 100); });
@@ -274,7 +264,6 @@ class HomeTab extends Component{
       await new Promise(resolve => { setTimeout(resolve, 100); });
       this.setSampleProfilePic();
       this.setState({loaded: true});
-
 
       // Sleep for half a second
       await new Promise(resolve => { setTimeout(resolve, 100); });
