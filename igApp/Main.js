@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Platform, Button,TouchableOpacity} from 'react-native';
-import { createStackNavigator, createBottomTabNavigator, createAppContainer, HeaderBackButton } from 'react-navigation'
+import { createStackNavigator, createBottomTabNavigator, createAppContainer, HeaderBackButton, StackActions } from 'react-navigation'
 import { SearchBar } from 'react-native-elements';
 
 import AddMediaTab from './AddMediaTab'
@@ -11,6 +11,7 @@ import SearchTab from './SearchTab'
 import EditProfile from './EditProfile'
 import ViewComment from './ViewComment'
 import Login from './Login'
+import firebase from './Firebase.js'
 
 export default class Main extends React.Component {
 
@@ -64,6 +65,7 @@ const navigationOptionsViewComment = ({ navigation }) => ({
 
 const navigationOptionsLogout = ({ navigation }) => ({
   headerRight: <Button title="logout" onPress={() => navigation.navigate('Login')} />,
+  headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
 })
 
 const navigationOptionsOtherProfile = ({ navigation }) => ({
@@ -75,26 +77,41 @@ const navigationOptionsOtherProfile = ({ navigation }) => ({
   title: 'Profile',
 })
 
-const ProfileTabStackNavigator = createAppContainer(createStackNavigator(
+const ProfileTabStackNavigator = createAppContainer(
+  
+  
+  createStackNavigator(
   {
     ProfileTab:{ // view for profile
       screen: ProfileTab,
-      navigationOptionsLogout,
-      navigationOptions: {
-        headerTitleStyle: { alignSelf: 'center', flex:1},
+      navigationOptions: ({ navigation, screenProps }) => ({// options for header
+        title: 'Profile',
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
-        title: 'Profile',
-      },
+        headerTitleStyle: { alignSelf: 'center', flex:1 },
+        headerRight: (
+          <TouchableOpacity
+            onPress={() => firebase.auth().signOut().then(navigation.navigate("Login"))}>
+            <Image
+              style = {{width:35, height:35, marginRight:8}}
+              source={require('./assets/images/logout.png')}
+            />
+            
+         </TouchableOpacity>
+        ),
+      }),
+     
     },
 
     EditProfile:{ // view for edit profile, which is inside profile view
       screen: EditProfile,
       navigationOptionsEditProfile
-    }
+    },
+
   }
-));
+)
+);
 
 
 const HomeTabStackNavigator = createAppContainer(createStackNavigator(

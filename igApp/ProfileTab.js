@@ -343,8 +343,8 @@ class ProfileTab extends Component{
                   <Left>
                       <Thumbnail source={{uri: item.profile_picture}} />
                       <Body>
-                          <Text>{item.username} </Text>
-                          <Text note>Jan 15, 2018</Text>
+                          <Text style={{ fontWeight: "900" }}>{item.username} </Text>
+                          <Text note>{item.date}</Text>
                       </Body>
                   </Left>
                 </CardItem>
