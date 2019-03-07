@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList} from "react-native";
+import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList,Alert} from "react-native";
 import { Card, CardItem, Thumbnail, Body, Left, Right, Button, Icon } from 'native-base';
 import firebase from './Firebase';
 
@@ -22,6 +22,7 @@ class ProfileTab extends Component{
       isFetching: false,
       posts: [],
       postsNum:0,
+      isDeleteButton: true,
       currentUser: '',
       follow:"Follow"
     }
@@ -60,7 +61,6 @@ class ProfileTab extends Component{
     var loginFile = require('./Login');
     const followingRef = rootRef.child('Following/' + loginFile.loggedInUser);
 
-
     var userId
     var followerRef
 
@@ -72,6 +72,18 @@ class ProfileTab extends Component{
         this.setState({follow:"Follow"})
 
     })
+  }
+
+  handleDelete =(postID) => {
+    console.log("the photo is going to delete is " + postID)
+
+    var loginFile = require('./Login');
+    const postRef = rootRef.child('Post/')
+    const postByUserIDRef = rootRef.child('PostByUserID/' + loginFile.loggedInUser) 
+
+    postRef.update({[postID]: null});
+    postByUserIDRef.update({[postID]:null});
+
   }
 
   async onRefresh(userID){
@@ -129,12 +141,13 @@ class ProfileTab extends Component{
           //get username of poster
           firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
             username = childSnapshot.val().username;
-          })
-
-          //get profile picture of poster
-          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
             profilePicture = childSnapshot.val().profile_picture;
           })
+
+          // //get profile picture of poster
+          // firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
+          //   profilePicture = childSnapshot.val().profile_picture;
+          // })
 
           //get profile picture of poster
           firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
@@ -145,6 +158,7 @@ class ProfileTab extends Component{
           })
 
           feedList.push({
+               postID: post.key,
                caption: post.val().caption,
                commments: post.val().comments,
                date: post.val().date,
@@ -210,7 +224,7 @@ class ProfileTab extends Component{
         await new Promise(resolve => { setTimeout(resolve, 200); });
 
     }
-    else{
+    else{ // if this profile is for other users
         var loginFile = require('./Login');
         var userId
          rootRef.child('Usernames/'+this.params.username).on("value",(snapshot) => {
@@ -218,9 +232,6 @@ class ProfileTab extends Component{
          //   console.log(this.params.username)
             console.log(userId)
             //get reference to the logged in user from database
-
-
-
 
              const userRef = rootRef.child('Users/' + userId);
              const followingRef = rootRef.child('Following/' + userId);
@@ -257,7 +268,10 @@ class ProfileTab extends Component{
              postRef.on("value", (snapshot) => {
                  this.setState({postsNum:snapshot.numChildren() })
              })
-             this.setState({currentUser: userId});
+             this.setState({
+               currentUser: userId,
+               isDeleteButton:false 
+              });
 
              this.getPostsByUserID(userId)
          })
@@ -348,6 +362,23 @@ class ProfileTab extends Component{
                           <Text note>{item.date}</Text>
                       </Body>
                   </Left>
+                  <Right>
+                    {this.state.isDeleteButton? <TouchableOpacity
+                      onPress={() => Alert.alert(
+                        'Delete the photo?',
+                        'deleted photo will not be recovered ',
+                        [
+                          {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                          {text: 'Delete', onPress: () =>  this.handleDelete(item.postID), style: 'destructive'},
+                        ],
+                        { cancelable: false }
+                      )}>
+                      <Image
+                        style = {{width:30, height:30, marginRight:0}}
+                        source={require('./assets/images/delete.png')}
+                      />
+                    </TouchableOpacity>:null}
+                  </Right>
                 </CardItem>
 
                 <CardItem cardBody>
