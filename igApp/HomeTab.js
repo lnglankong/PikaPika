@@ -28,6 +28,7 @@ class HomeTab extends Component{
     followingPosts: [],
     feedPosts: [],
     feedPostsArray: [],
+    likedPosts: [],
     isFetching: false,
     SampleProfilePic: ''
   }
@@ -110,22 +111,34 @@ class HomeTab extends Component{
             })
           })
 
+          var liked = false;
+          var likesPicture = require('./assets/images/likeIcon.png');
+
+          // check whether or not user already liked this post
+          if(this.state.likedPosts.includes(post.key)){
+            // user has already liked this post
+            liked = true;
+            likesPicture = require('./assets/images/likeFilledIcon.png');
+          }
+
           //... get the post information
           feedList.push({
                caption: post.val().caption,
                commments: post.val().comments,
                date: post.val().date,
                hashtag: post.val().hashtag,
-               likes: post.val().likes,
                picture: post.val().picture,
                username: username,
+               likes: post.val().likes,
                profile_picture: profilePicture,
+               likesPicture: likesPicture,
+               userLiked: liked,
                commentsCount: commentsCount,
-               likesPicture: require('./assets/images/likeIcon.png'),
-               userLiked: false,
                postIndex: postCount,
-               key: post.key
+               key: post.key,
           });
+
+
 
           postCount++;
           //console.log("PostCount: " + postCount);
@@ -166,7 +179,7 @@ class HomeTab extends Component{
 
   handleLikePress(item){
     //check if user already liked this post
-    if(item.userLiked == false){
+    if(item.userLiked == false){ //not liked yet
       item.userLiked = true
 
 
@@ -195,19 +208,12 @@ class HomeTab extends Component{
         postRef.update({likes: currentLikes});
       })
 
-      /*
-      firebase.database().ref("Post/" + item.key).on("value", (childSnapshot5) => {
-        currentLikes = childSnapshot5.likes;
-      })
+      //add post ID to list of user's liked posts in state
+      var likesArray = this.state.likedPosts;
+      likesArray.push(item.key);
+      this.setState({likesPosts: likesArray});
 
-      console.log("Mid database");
-
-      firebase.database().ref("Post/" + item.key).child("likes").transaction(function(currentLikes) {
-        currentLikes + 1;
-      });
-      */
-
-    }else{
+    }else{ //already liked
       item.userLiked = false
 
       //switch like icon to empty heart and decrease number of likes
@@ -236,16 +242,11 @@ class HomeTab extends Component{
         postRef.update({likes: currentLikes});
       })
 
-      /*
-      let currentLikes = ''
-      firebase.database().ref("Post/" + item.key).on("value", (childSnapshot5) => {
-        currentLikes = childSnapshot5.likes;
-      })
+      //remove post ID to list of user's liked posts in state
+      var likesArray = this.state.likedPosts;
+      likesArray.splice(likesArray.indexOf(item.key), 1);
+      this.setState({likesPosts: likesArray});
 
-      firebase.database().ref("Post/" + item.key).child("likes").transaction(function(currentLikes) {
-        currentLikes - 1;
-      });
-      */
     }
 
   }
@@ -295,7 +296,7 @@ class HomeTab extends Component{
             onRefresh={async () => this.onRefresh()}
             refreshing={this.state.isFetching}
             renderItem={({item}) =>
-              
+
               <View>
                 <Card style={{ height: 610 }}>
                   <CardItem>

@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList,Alert} from "react-native";
 import { Card, CardItem, Thumbnail, Body, Left, Right, Button, Icon } from 'native-base';
+import update from 'immutability-helper';
 import firebase from './Firebase';
 
 
@@ -21,6 +22,7 @@ class ProfileTab extends Component{
       postsByID: [],
       isFetching: false,
       posts: [],
+      likedPosts: [],
       postsNum:0,
       isDeleteButton: true,
       currentUser: '',
@@ -79,10 +81,84 @@ class ProfileTab extends Component{
 
     var loginFile = require('./Login');
     const postRef = rootRef.child('Post/')
-    const postByUserIDRef = rootRef.child('PostByUserID/' + loginFile.loggedInUser) 
+    const postByUserIDRef = rootRef.child('PostByUserID/' + loginFile.loggedInUser)
 
     postRef.update({[postID]: null});
     postByUserIDRef.update({[postID]:null});
+
+  }
+
+  handleLikePress(item){
+    //check if user already liked this post
+    if(item.userLiked == false){ //not liked yet
+      item.userLiked = true
+
+
+      //switch like icon to filled in heart
+      this.setState({
+        posts: update(this.state.posts, {
+          [item.postIndex]: {
+            likesPicture: {
+              $set: require('./assets/images/likeFilledIcon.png')
+            },
+            likes: {
+              $set: item.likes+1
+            },
+            userLiked: {
+              $set: true
+            }
+          }
+        })
+      })
+
+      //update new amount of likes on firebase
+      firebase.database().ref("Post/" + item.key).once('value', (snapshot) =>{
+        let currentLikes = snapshot.val().likes + 1;
+
+        const postRef = rootRef.child('Post/' + item.key);
+        postRef.update({likes: currentLikes});
+      })
+
+      //add post ID to list of user's liked posts in state
+      var likesArray = this.state.likedPosts;
+      likesArray.push(item.key);
+      this.setState({likesPosts: likesArray});
+
+    }else{ //already liked
+      item.userLiked = false
+
+      //switch like icon to empty heart and decrease number of likes
+      this.setState({
+        posts: update(this.state.posts, {
+          [item.postIndex]: {
+            likesPicture: {
+              $set: require('./assets/images/likeIcon.png')
+            },
+            likes: {
+              $set: item.likes-1
+            },
+            userLiked: {
+              $set: false
+            }
+          }
+        })
+      })
+
+      //update new amount of likes on firebase
+      firebase.database().ref("Post/" + item.key).once('value', (snapshot) =>{
+
+        let currentLikes = snapshot.val().likes - 1;
+
+        const postRef = rootRef.child('Post/' + item.key);
+        postRef.update({likes: currentLikes});
+      })
+
+      //remove post ID to list of user's liked posts in state
+      var likesArray = this.state.likedPosts;
+      likesArray.splice(likesArray.indexOf(item.key), 1);
+      this.setState({likesPosts: likesArray});
+
+    }
 
   }
 
@@ -157,6 +233,16 @@ class ProfileTab extends Component{
             })
           })
 
+          var liked = false;
+          var likesPicture = require('./assets/images/likeIcon.png');
+
+          // check whether or not user already liked this post
+          if(this.state.likedPosts.includes(post.key)){
+            // user has already liked this post
+            liked = true;
+            likesPicture = require('./assets/images/likeFilledIcon.png');
+          }
+
           feedList.push({
                postID: post.key,
                caption: post.val().caption,
@@ -168,8 +254,8 @@ class ProfileTab extends Component{
                username: username,
                profile_picture: profilePicture,
                commentsCount: commentsCount,
-               likesPicture: require('./assets/images/likeIcon.png'),
-               userLiked: false,
+               likesPicture: likesPicture,
+               userLiked: liked,
                postIndex: postCount,
                key: post.key
           });
@@ -270,7 +356,7 @@ class ProfileTab extends Component{
              })
              this.setState({
                currentUser: userId,
-               isDeleteButton:false 
+               isDeleteButton:false
               });
 
              this.getPostsByUserID(userId)
