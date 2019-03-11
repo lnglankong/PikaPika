@@ -34,6 +34,15 @@ class AddMediaTab extends Component{
 
     //add post to PostByUserID table
     firebase.database().ref().child('PostByUserID/' + this.state.userID + '/' + postID.key).set(true);
+
+    // Hashtag feature
+    var tokens = this.state.caption.split(' ')
+    for (var i in tokens) {
+      if(tokens[i].startsWith('#')) {
+        // add hashtag to Hashtag branch
+        firebase.database().ref().child('Hashtag/' + tokens[i].substring(1) + '/' + postID.key).set(true);
+      }
+    }
   }
 
   //choose a picture from user's camera roll to upload
