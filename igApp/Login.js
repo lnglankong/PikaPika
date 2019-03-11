@@ -33,6 +33,12 @@ export default class Login extends React.Component {
       this.setState({ fontLoaded: true });
     })
 
+    await Expo.Font.loadAsync({
+      'Noteworthy': require('./assets/fonts/Noteworthy-Lt.ttf')
+    }).then(() => {
+      this.setState({ fontLoaded: true });
+    })
+
   }
 
   handleLogin = () => {

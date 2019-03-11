@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, Text, StyleSheet, TouchableWithoutFeedback, Keyboard, TextInput, Button, FlatList} from "react-native";
+import {View, Text, StyleSheet, TouchableWithoutFeedback, Keyboard, TextInput, Button, Dimensions, FlatList} from "react-native";
 import { Card, CardItem, Thumbnail, Body, Left, Right, Icon } from 'native-base';
 
 import firebase from './Firebase.js'
@@ -60,7 +60,7 @@ class ViewComment extends Component{
       })
     })
 
-    const wait = new Promise((resolve) => setTimeout(resolve, 1000));
+    const wait = new Promise((resolve) => setTimeout(resolve, 2000));
     wait.then( () => {
         this.flatList.scrollToEnd({ animated: true });
     });
@@ -104,7 +104,7 @@ class ViewComment extends Component{
   render(){
     return(
       <View style={styles.mainContainer}>
-        <View style={{ height: 630 }}>
+        <View style={styles.flatListContainer}>
           <FlatList
             ref={ (ref) => { this.flatList = ref; }}
             data = {this.state.comments}
@@ -131,7 +131,7 @@ class ViewComment extends Component{
             keyExtractor={(item, index) => item.key}
           />
         </View>
-        <View style={{ height: 100, flexDirection: 'row' }}>
+        <View style={{ height: 100,flex: 1, flexDirection: 'row'}}>
 
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
               <View style={styles.container}>
@@ -160,15 +160,21 @@ class ViewComment extends Component{
 
 export default ViewComment
 
+const win = Dimensions.get('window');
+
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      paddingBottom: 1,
     },
     mainContainer: {
-        flex: 1,
+      flex: 1,
+    },
+    flatListContainer: {
+      flex: 1,
     },
     textInput: {
       height: 50,

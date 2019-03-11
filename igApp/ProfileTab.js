@@ -303,7 +303,6 @@ class ProfileTab extends Component{
   }
 
 
-
   async componentWillMount(){
 
     if (this.params == null){ // if the profile is for the login user
