@@ -23,11 +23,12 @@ class HomeTab extends Component{
 
   state = {
     loaded: false,
-    data: null,
+    //data: null,
     usersFollowing: [],
     followingPosts: [],
     feedPosts: [],
     feedPostsArray: [],
+    commentsCountArray: [],
     likedPosts: [],
     isFetching: false,
     SampleProfilePic: ''
@@ -48,10 +49,8 @@ class HomeTab extends Component{
 
         followingKeys.forEach((currentFollowingUserID) => {
           usersFollowing.push(currentFollowingUserID);
-
-          this.setState({usersFollowing: usersFollowing});
-
         })
+        this.setState({usersFollowing: usersFollowing});
       }
     })
 
@@ -75,6 +74,29 @@ class HomeTab extends Component{
     })
   }
 
+  getComments(){
+    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+
+      var commentsList = [];
+      snapshot.forEach((post) => {
+
+        if(this.state.followingPosts.includes(post.key)){
+          var commentsCount = 0;
+
+          //get profile picture of poster
+          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
+
+            childSnapshot.forEach((comment) => {
+              commentsCount++;
+            })
+            commentsList.push(commentsCount);
+            this.setState({commentsCountArray: commentsList});
+          })
+        }
+      })
+    })
+  }
+
   getFeedPosts(){
     //Get the all the posts from the current postID
 
@@ -91,7 +113,18 @@ class HomeTab extends Component{
 
           let username = '';
           let profilePicture = '';
-          let commentsCount = 0;
+          let commentsCount = '';
+          let snapshotSave = '';
+
+          //get profile picture of poster
+          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
+            snapshot = childSnapshot;
+            /*
+            childSnapshot.forEach((comment) => {
+              console.log("increasing comment count");
+              commentsCount++;
+            })*/
+          })
 
           //get username of poster
           firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
@@ -101,14 +134,6 @@ class HomeTab extends Component{
           //get profile picture of poster
           firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
             profilePicture = childSnapshot.val().profile_picture;
-          })
-
-          //get profile picture of poster
-          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
-            //commentsCount = childSnapshot.numChildren();
-            childSnapshot.forEach((comment) => {
-              commentsCount++;
-            })
           })
 
           var liked = false;
@@ -121,6 +146,8 @@ class HomeTab extends Component{
             likesPicture = require('./assets/images/likeFilledIcon.png');
           }
 
+
+
           //... get the post information
           feedList.push({
                caption: post.val().caption,
@@ -130,10 +157,10 @@ class HomeTab extends Component{
                picture: post.val().picture,
                username: username,
                likes: post.val().likes,
+               commentsCount: this.state.commentsCountArray[postCount],
                profile_picture: profilePicture,
                likesPicture: likesPicture,
                userLiked: liked,
-               commentsCount: commentsCount,
                postIndex: postCount,
                key: post.key,
           });
@@ -163,6 +190,8 @@ class HomeTab extends Component{
     this.getusersFollowing();
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFollowingPosts();
+    await new Promise(resolve => { setTimeout(resolve, 100); });
+    this.getComments();
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFeedPosts();
     await new Promise(resolve => { setTimeout(resolve, 200); });
@@ -261,6 +290,8 @@ class HomeTab extends Component{
       await new Promise(resolve => { setTimeout(resolve, 100); });
       this.getFollowingPosts();
       await new Promise(resolve => { setTimeout(resolve, 100); });
+      this.getComments();
+      await new Promise(resolve => { setTimeout(resolve, 100); });
       this.getFeedPosts();
       await new Promise(resolve => { setTimeout(resolve, 100); });
       this.setSampleProfilePic();
@@ -270,19 +301,9 @@ class HomeTab extends Component{
       await new Promise(resolve => { setTimeout(resolve, 100); });
 
       this.setState(this.state.feedPosts);
-      //this.setState({feedPostsArray: Object.values(this.state.feedPosts)});
-      //console.log(this.state.feedPostsArray);
-      //console.log(this.state.feedPosts[0].val().caption);
-
-      //  console.log(JSON.stringify(this.state.feedPosts[0].val().date));
-
-      //sort activity feed posts array by most recent to oldest
-      //this.state.feedPosts.sort(this.custom_sort());
 
       // Sleep for half a second
       await new Promise(resolve => { setTimeout(resolve, 500); });
-
-      //console.log(this.state.feedPostsArray);
     }
   }
 
@@ -304,7 +325,7 @@ class HomeTab extends Component{
                         <Thumbnail source={{uri: item.profile_picture}} />
                         <Body>
                             <Text style={{ fontWeight: "900" }}>{item.username} </Text>
-                            <Text note>{item.date}</Text>
+                            <Text style={{color: 'gray'}} note>{item.date}</Text>
                         </Body>
                     </Left>
                   </CardItem>
@@ -344,7 +365,7 @@ class HomeTab extends Component{
                         commentsObject: item.comments,
                         postID: item.key
                       })}>
-                        <Text>{"View " + item.commentsCount + " comments"} </Text>
+                        <Text style={{color: 'gray'}}>{"View " + item.commentsCount + " comments"} </Text>
                       </TouchableOpacity>
                     </Body>
                   </CardItem>

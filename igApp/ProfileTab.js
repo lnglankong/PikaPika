@@ -26,6 +26,8 @@ class ProfileTab extends Component{
       postsNum:0,
       isDeleteButton: true,
       currentUser: '',
+      commentsCountArray: [],
+      comments: [],
       follow:"Follow"
     }
   }
@@ -167,11 +169,11 @@ class ProfileTab extends Component{
     this.setState({isFetching: true})
 
     this.getPostsByUserID(userID)
+    await new Promise(resolve => { setTimeout(resolve, 100); });
     this.getFeedPosts()
-    await new Promise(resolve => { setTimeout(resolve, 200); });
-
-    // Sleep for half a second
-    await new Promise(resolve => { setTimeout(resolve, 200); });
+    await new Promise(resolve => { setTimeout(resolve, 100); });
+    this.getComments()
+    await new Promise(resolve => { setTimeout(resolve, 100); });
     this.setState({isFetching: false});
   }
 
@@ -190,8 +192,37 @@ class ProfileTab extends Component{
         })
       }
     })
+  }
+
+  getComments(){
+    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+
+      var commentsCountList = []; //array of # of comments per post
+      var commentsList = []; //array of comment snapshots per post
+
+      snapshot.forEach((post) => {
+
+        if(this.state.postsByID.includes(post.key)){
+          var commentsCount = 0;
+
+          //get profile picture of poster
+          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
+
+            childSnapshot.forEach((comment) => {
+              commentsCount++;
+            })
+
+            commentsCountList.push(commentsCount);
+            commentsList.push(childSnapshot);
+
+            this.setState({commentsCountArray: commentsCountList});
+            this.setState({comments: commentsList});
+          })
 
 
+        }
+      })
+    })
   }
 
   getFeedPosts(){
@@ -214,7 +245,7 @@ class ProfileTab extends Component{
           let profilePicture = '';
           let commentsCount = 0;
 
-          //get username of poster
+          //get username and profile picture of poster
           firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
             username = childSnapshot.val().username;
             profilePicture = childSnapshot.val().profile_picture;
@@ -246,14 +277,14 @@ class ProfileTab extends Component{
           feedList.push({
                postID: post.key,
                caption: post.val().caption,
-               commments: post.val().comments,
+               commments: this.state.comments[postCount],
                date: post.val().date,
                hashtag: post.val().hashtag,
                likes: post.val().likes,
                picture: post.val().picture,
                username: username,
                profile_picture: profilePicture,
-               commentsCount: commentsCount,
+               commentsCount: this.state.commentsCountArray[postCount],
                likesPicture: likesPicture,
                userLiked: liked,
                postIndex: postCount,
@@ -307,7 +338,7 @@ class ProfileTab extends Component{
         })
 
         this.getPostsByUserID(loginFile.loggedInUser);
-        await new Promise(resolve => { setTimeout(resolve, 200); });
+        await new Promise(resolve => { setTimeout(resolve, 100); });
 
     }
     else{ // if this profile is for other users
@@ -363,12 +394,13 @@ class ProfileTab extends Component{
          })
 
 
-         await new Promise(resolve => { setTimeout(resolve, 200); });
+         await new Promise(resolve => { setTimeout(resolve, 100); });
 
     }
-
+    this.getComments();
+    await new Promise(resolve => { setTimeout(resolve, 400); });
     this.getFeedPosts();
-    await new Promise(resolve => { setTimeout(resolve, 200); });
+    await new Promise(resolve => { setTimeout(resolve, 100); });
   }
 
   render(){
@@ -445,7 +477,7 @@ class ProfileTab extends Component{
                       <Thumbnail source={{uri: item.profile_picture}} />
                       <Body>
                           <Text style={{ fontWeight: "900" }}>{item.username} </Text>
-                          <Text note>{item.date}</Text>
+                          <Text style={{color: 'gray'}} note>{item.date}</Text>
                       </Body>
                   </Left>
                   <Right>
@@ -500,8 +532,9 @@ class ProfileTab extends Component{
                   <Body>
                     <TouchableOpacity onPress={() => this.props.navigation.navigate('ViewComment', {
                       commentsObject: item.comments,
+                      postID: item.postID,
                     })}>
-                      <Text>{"View " + item.commentsCount + " comments"} </Text>
+                      <Text style={{color: 'gray'}}>{"View " + item.commentsCount + " comments"} </Text>
                     </TouchableOpacity>
                   </Body>
                 </CardItem>
