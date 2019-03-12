@@ -1,15 +1,13 @@
 import React, { Component } from "react";
-import { View, StyleSheet, Button, Image, Alert, Platform, TextInput, Keyboard, TouchableWithoutFeedback} from "react-native";
+import { View, StyleSheet, Image, Alert, Platform, Text, TouchableOpacity} from "react-native";
 import { ImagePicker, Permissions } from "expo";
 
 import firebase from './Firebase.js'
 
 class AddMediaTab extends Component{
   state = {
-    // TODO: Change this default image later
     userID: "",
-    caption: "",
-    picture: "https://firebasestorage.googleapis.com/v0/b/ecs165a.appspot.com/o/default_profile_pic.png?alt=media&token=fd2ec8c0-97a0-4dca-9170-cd6c4bf6efd3",
+    picture: null,
   };
 
   componentDidMount(){
@@ -19,30 +17,6 @@ class AddMediaTab extends Component{
     //get reference to the logged in user from database
     const userRef = firebase.database().ref().child('Users/' + loginFile.loggedInUser);
     this.setState({ userID: userRef.key });
-  }
-
-  //add a new post to the database
-  createPost = async () => {
-    //Add post to Post table with a unique key
-    const postID = firebase.database().ref('Post/').push({
-      'caption': this.state.caption,
-      'date': new Date().toLocaleString(),
-      'likes': 0,
-      'picture': this.state.picture,
-      'userID': this.state.userID
-    })
-
-    //add post to PostByUserID table
-    firebase.database().ref().child('PostByUserID/' + this.state.userID + '/' + postID.key).set(true);
-
-    // Hashtag feature
-    var tokens = this.state.caption.split(' ')
-    for (var i in tokens) {
-      if(tokens[i].startsWith('#')) {
-        // add hashtag to Hashtag branch
-        firebase.database().ref().child('Hashtag/' + tokens[i].substring(1) + '/' + postID.key).set(true);
-      }
-    }
   }
 
   //choose a picture from user's camera roll to upload
@@ -65,7 +39,9 @@ class AddMediaTab extends Component{
             const currentTime = Date.now();
             const uploadUrl = await this.uploadImage(uri, currentTime);
             this.setState({ picture: uploadUrl });
-            Alert.alert("Success");
+            this.props.navigation.navigate('CreatePost', {
+              picture: this.state.picture,
+            })
           }
           catch (error) {
             Alert.alert(error);
@@ -86,7 +62,9 @@ class AddMediaTab extends Component{
           const currentTime = Date.now();
           const uploadUrl = await this.uploadImage(uri, currentTime);
           this.setState({ picture: uploadUrl });
-          Alert.alert("Success");
+          this.props.navigation.navigate('CreatePost', {
+            picture: this.state.picture,
+          })
         }
         catch (error) {
           Alert.alert(error);
@@ -108,7 +86,9 @@ class AddMediaTab extends Component{
           const currentTime = Date.now();
           const uploadUrl = await this.uploadImage(uri, currentTime);
           this.setState({ picture: uploadUrl });
-          Alert.alert("Success");
+          this.props.navigation.navigate('CreatePost', {
+            picture: this.state.picture,
+          })
         }
         catch (error) {
           Alert.alert(error);
@@ -130,7 +110,9 @@ class AddMediaTab extends Component{
         const currentTime = Date.now();
         const uploadUrl = await this.uploadImage(uri, currentTime);
         this.setState({ picture: uploadUrl });
-        Alert.alert("Success");
+        this.props.navigation.navigate('CreatePost', {
+          picture: this.state.picture,
+        })
       }
       catch (error) {
         Alert.alert(error);
@@ -168,26 +150,20 @@ class AddMediaTab extends Component{
   }
 
   render(){
-    return(
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style = {styles.container}>
-          <Image style={styles.picture} source={{uri: this.state.picture}}/>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Write a caption..."
-            autoCapitalize="none"
-            onChangeText={caption => this.setState({ caption })}
-            value={this.state.caption}
-            multiline={true}
-          />
-          <Button
-            title="Share"
-            onPress={this.createPost}
-          />
-          <Button title="Gallery" onPress={this.selectPicture} />
-          <Button title="Camera" onPress={this.takePicture} />
-        </View>
-      </TouchableWithoutFeedback>
+    return (
+      <View style = {styles.container}>
+        <Image style={styles.picture} source={{uri: "https://firebasestorage.googleapis.com/v0/b/ecs165a.appspot.com/o/hellokittycamera.png?alt=media&token=d52362c9-ee95-43f8-8e53-243615bdd2de"}}/>
+        <TouchableOpacity style={styles.button} onPress={this.selectPicture}>
+          <Text style={styles.buttonText}>
+            Upload From Gallery
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={this.takePicture}>
+          <Text style={styles.buttonText}>
+            Take Photo
+          </Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -197,14 +173,14 @@ export default AddMediaTab
 
 const styles = StyleSheet.create({
     container: {
-        //flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
+      alignItems: 'center',
+      justifyContent: 'center'
     },
     picture: {
-      width: 320,
-      height: 320,
-      backgroundColor: 'gray'
+      height: 370, 
+      width: 370, 
+      marginTop: 15,
+      borderRadius: 20,
     },
     textInput: {
       height: 50,
@@ -214,4 +190,21 @@ const styles = StyleSheet.create({
       borderWidth: 1,
       marginTop: 10
     },
+    buttonText: {
+      color: "black",
+      textAlign:'center',
+      fontSize: 20,
+      fontFamily:"Chalkboard SE",
+    },
+    button:{
+      marginLeft: '10%',
+      marginRight:'10%',
+      marginTop:15,
+      borderWidth: 1.5,
+      borderRadius: 15,
+      justifyContent: 'center',
+      height: 50,
+      width: 370,
+      backgroundColor:"#F7D2F7"
+    }
 });

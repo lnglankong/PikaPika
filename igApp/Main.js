@@ -11,6 +11,7 @@ import SearchTab from './SearchTab'
 import EditProfile from './EditProfile'
 import ViewComment from './ViewComment'
 import Login from './Login'
+import CreatePost from './CreatePost'
 import firebase from './Firebase.js'
 
 export default class Main extends React.Component {
@@ -61,6 +62,10 @@ const navigationOptionsEditProfile = ({ navigation }) => ({
 
 const navigationOptionsViewComment = ({ navigation }) => ({
     headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
+})
+
+const navigationOptionsCreatePost = ({ navigation }) => ({
+  headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
 })
 
 const navigationOptionsLogout = ({ navigation }) => ({
@@ -187,13 +192,19 @@ const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
       screen: AddMediaTab,
       navigationOptions: {// options for header
         title: 'Media',
+        headerBackTitle: 'Back',
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
         headerTitleStyle: { alignSelf: 'center', flex:1},
       }
+    },
+
+    CreatePost:{ 
+      screen: CreatePost,
+      navigationOptionsCreatePost
     }
-  }
+  },
 ));
 
 const AppTabNavigator = createAppContainer(createBottomTabNavigator(
