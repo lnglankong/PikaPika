@@ -1,7 +1,6 @@
 import React from 'react'
-import { Platform, StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View, TouchableWithoutFeedback, Keyboard} from 'react-native'
 import { Button } from 'react-native-elements';
-import { Font } from 'expo';
 
 import firebase from './Firebase.js'
 
@@ -62,42 +61,44 @@ export default class Login extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text style = {Platform.OS === 'ios' ? styles.textPika : (this.state.fontLoaded == true ? styles.textPika : '')}>PikaPika</Text>
-        {
-          this.state.errorMessage &&
-          <Text style={{ color: 'red' }}>
-            {this.state.errorMessage}
-          </Text>
-        }
-        <TextInput
-          style={styles.textInput}
-          autoCapitalize="none"
-          placeholder="Email"
-          onChangeText={email => this.setState({ email })}
-          value={this.state.email}
-        />
-        <TextInput
-          secureTextEntry
-          style={styles.textInput}
-          autoCapitalize="none"
-          placeholder="Password"
-          onChangeText={password => this.setState({ password })}
-          value={this.state.password}
-        />
-       <Button
-          title = "login"
-          buttonStyle ={styles.loginBackground}
-          onPress={this.handleLogin}
-        />
-
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <Text style = {Platform.OS === 'ios' ? styles.textPika : (this.state.fontLoaded == true ? styles.textPika : '')}>PikaPika</Text>
+          {
+            this.state.errorMessage &&
+            <Text style={{ color: 'red' }}>
+              {this.state.errorMessage}
+            </Text>
+          }
+          <TextInput
+            style={styles.textInput}
+            autoCapitalize="none"
+            placeholder="Email"
+            onChangeText={email => this.setState({ email })}
+            value={this.state.email}
+          />
+          <TextInput
+            secureTextEntry
+            style={styles.textInput}
+            autoCapitalize="none"
+            placeholder="Password"
+            onChangeText={password => this.setState({ password })}
+            value={this.state.password}
+          />
         <Button
-          title="Don't have an account? Sign Up"
-          type = "clear"
-          color = "black"
-          onPress={() => this.props.navigation.navigate('SignUp')}
-        />
-      </View>
+            title = "login"
+            buttonStyle ={styles.loginBackground}
+            onPress={this.handleLogin}
+          />
+
+          <Button
+            title="Don't have an account? Sign Up"
+            type = "clear"
+            color = "black"
+            onPress={() => this.props.navigation.navigate('SignUp')}
+          />
+        </View>
+      </TouchableWithoutFeedback>
     )
   }
 }

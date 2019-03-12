@@ -1,8 +1,7 @@
 // SignUp.js
 import React from 'react';
-import { StyleSheet, Text, View, Image, TextInput, Platform } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Button } from 'react-native-elements';
-import { Font } from 'expo';
 
 import firebase from './Firebase.js'
 
@@ -78,45 +77,47 @@ export default class SignUp extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text style = {Platform.OS === 'ios' ? styles.textPika : (this.state.fontLoaded == true ? styles.textPika : '')}>Sign Up</Text>
-        {this.state.errorMessage &&
-          <Text style={{ color: 'red' }}>
-            {this.state.errorMessage}
-          </Text>}
-        <TextInput
-          placeholder="Username"
-          autoCapitalize="none"
-          style={styles.firstTextInput}
-          onChangeText={username => this.setState({ username })}
-          value={this.state.username}
-        />
-        <TextInput
-          placeholder="Email"
-          autoCapitalize="none"
-          style={styles.textInput}
-          onChangeText={email => this.setState({ email })}
-          value={this.state.email}
-        />
-        <TextInput
-          secureTextEntry
-          placeholder="Password"
-          autoCapitalize="none"
-          style={styles.textInput}
-          onChangeText={password => this.setState({ password })}
-          value={this.state.password}
-        />
-        <Button
-          buttonStyle ={styles.loginBackground}
-          title="Join Now"
-          onPress={this.handleSignUp}
-        />
-        <Button
-          type = "clear"
-          title="Already have an account? Login"
-          onPress={() => this.props.navigation.navigate('Login')}
-        />
-      </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <Text style = {Platform.OS === 'ios' ? styles.textPika : (this.state.fontLoaded == true ? styles.textPika : '')}>Sign Up</Text>
+          {this.state.errorMessage &&
+            <Text style={{ color: 'red' }}>
+              {this.state.errorMessage}
+            </Text>}
+          <TextInput
+            placeholder="Username"
+            autoCapitalize="none"
+            style={styles.firstTextInput}
+            onChangeText={username => this.setState({ username })}
+            value={this.state.username}
+          />
+          <TextInput
+            placeholder="Email"
+            autoCapitalize="none"
+            style={styles.textInput}
+            onChangeText={email => this.setState({ email })}
+            value={this.state.email}
+          />
+          <TextInput
+            secureTextEntry
+            placeholder="Password"
+            autoCapitalize="none"
+            style={styles.textInput}
+            onChangeText={password => this.setState({ password })}
+            value={this.state.password}
+          />
+          <Button
+            buttonStyle ={styles.loginBackground}
+            title="Join Now"
+            onPress={this.handleSignUp}
+          />
+          <Button
+            type = "clear"
+            title="Already have an account? Login"
+            onPress={() => this.props.navigation.navigate('Login')}
+          />
+        </View>
+      </TouchableWithoutFeedback>
     )
   }
 }
