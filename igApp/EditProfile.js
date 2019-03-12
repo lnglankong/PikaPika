@@ -12,6 +12,7 @@ class EditProfile extends Component{
     last_name: '',
     email: '',
     biography: '',
+    userProfilePicture: '',
     errorMessage: null
   }
 
@@ -58,6 +59,12 @@ class EditProfile extends Component{
   render(){
     return(
       <ScrollView>
+        <View style={styles.addCommentContainer}>
+          <Thumbnail source={{uri: this.state.userProfilePicture}} style={styles.profilePictureContainer}/>
+          <TouchableOpacity onPress={this.addComment} style={styles.postButtonContainer}>
+            <Text styles={styles.buttonTextContainer}> Post </Text>
+          </TouchableOpacity>
+        </View>
         <Text>Change first name:</Text>
         <TextInput
           placeholder="First Name"

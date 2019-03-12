@@ -30,8 +30,7 @@ class HomeTab extends Component{
     feedPostsArray: [],
     commentsCountArray: [],
     likedPosts: [],
-    isFetching: false,
-    SampleProfilePic: ''
+    isFetching: false
   }
 
   getusersFollowing(){
@@ -178,12 +177,6 @@ class HomeTab extends Component{
     })
   }
 
-  setSampleProfilePic(){
-    firebase.database().ref('Users/userID1').on('value', (childSnapshot) => {
-      this.setState({SampleProfilePic: childSnapshot.val().profile_picture});
-    })
-  }
-
   async onRefresh(){
     console.log("Attempting to refresh");
     this.setState({isFetching: true})
@@ -195,7 +188,6 @@ class HomeTab extends Component{
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFeedPosts();
     await new Promise(resolve => { setTimeout(resolve, 200); });
-    this.setSampleProfilePic();
     this.setState({loaded: true});
 
 
@@ -294,7 +286,6 @@ class HomeTab extends Component{
       await new Promise(resolve => { setTimeout(resolve, 100); });
       this.getFeedPosts();
       await new Promise(resolve => { setTimeout(resolve, 100); });
-      this.setSampleProfilePic();
       this.setState({loaded: true});
 
       // Sleep for half a second
