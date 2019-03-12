@@ -473,10 +473,10 @@ class ProfileTab extends Component{
               <Card style={{ height: 610 }}>
                 <CardItem>
                   <Left>
-                      <Thumbnail source={{uri: item.profile_picture}} />
+                      <Thumbnail source={{uri: item.profile_picture}} style={{borderWidth: 2, borderColor:'#d3d3d3'}}/>
                       <Body>
                           <Text style={{ fontWeight: "900" }}>{item.username} </Text>
-                          <Text style={{color: 'gray'}} note>{item.date}</Text>
+                          <Text style={{color: '#FFB6C1'}} note>{item.date}</Text>
                       </Body>
                   </Left>
                   <Right>
@@ -533,7 +533,7 @@ class ProfileTab extends Component{
                       commentsObject: item.comments,
                       postID: item.postID,
                     })}>
-                      <Text style={{color: 'gray'}}>{"View " + item.commentsCount + " comments"} </Text>
+                      <Text style={{color: '#FFB6C1'}}>{"View " + item.commentsCount + " comments"} </Text>
                     </TouchableOpacity>
                   </Body>
                 </CardItem>
