@@ -3,10 +3,13 @@ import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList,Al
 import { Card, CardItem, Thumbnail, Body, Left, Right, Button, Icon } from 'native-base';
 import update from 'immutability-helper';
 import firebase from './Firebase';
-
+import { Constants,Permissions, Notifications } from 'expo';
+//import PushNotification from 'react-native-push-notification';
+import NotifService from './Notifications';
 
 //The reference to the root of the database, which is "Users"
 const rootRef = firebase.database().ref();
+
 
 class ProfileTab extends Component{
   constructor(props){
@@ -39,6 +42,7 @@ class ProfileTab extends Component{
       }else{
           this.handleUnFollow()
       }
+      this.presentLocalNotification
   }
 
   handleFollowing =() =>{
@@ -305,6 +309,7 @@ class ProfileTab extends Component{
 
 
   async componentWillMount(){
+    console.log('test')
 
     if (this.params == null){ // if the profile is for the login user
         //get logged-in user
@@ -401,13 +406,115 @@ class ProfileTab extends Component{
     await new Promise(resolve => { setTimeout(resolve, 400); });
     this.getFeedPosts();
     await new Promise(resolve => { setTimeout(resolve, 100); });
+
+    this.presentLocalNotification
   }
+
+
+//   onSubmit(e) {
+//     Keyboard.dismiss();
+
+//     const localNotification = {
+//         title: 'done',
+//         body: 'done!'
+//     };
+
+//     const schedulingOptions = {
+//         time: (new Date()).getTime() + Number(e.nativeEvent.text)
+//     }
+
+//     // Notifications show only when app is not active.
+//     // (ie. another app being used or device's screen is locked)
+//     Notifications.scheduleLocalNotificationAsync(
+//         localNotification,schedulingOptions
+//     );
+//   }
+
+ handleNotification() {
+     console.warn('ok! got your notif');
+  }
+
+async obtainNotificationPermission(){
+  
+  let permission = await Permissions.getAsync(Permissions.USER_FACING_NOTIFICATIONS);
+  if (permissions.status !== 'granted'){
+    permission = await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
+    if (permissions.status !== 'granted'){
+      Alert.alert('Permission not granted to show notifications')
+    }
+  }
+  return permission
+}
+
+async presentLocalNotification(){
+  Alert.alert('I am in present notification')
+  await this.obtainNotificationPermission
+  Notification.presentLocalNotificationAsync({
+    title: "hello",
+    body:'I am here',
+    ios:{
+      sound: true
+    }
+  })
+}
+
+// async componentDidMount() {
+//   // We need to ask for Notification permissions for ios devices
+
+
+//   let result = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+//   console.log('result = ', result)
+//   if (result.permissions.notifications.allowsAlert ) {
+//       console.log('Notification permissions granted.')
+//   }
+
+//   // If we want to do something with the notification when the app
+//   // is active, we need to listen to notification events and 
+//   // handle them in a callback
+//   Notifications.addListener(this.handleNotification);
+//   let t = new Date();
+//   t.setSeconds(t.getSeconds() + 10);
+//   const localNotification = {
+//     title: 'Warning',
+//     body: 'test test', // (string) — body text of the notification.
+//     ios: { // (optional) (object) — notification configuration specific to iOS.
+//       sound: true // (optional) (boolean) — if true, play a sound. Default: false.
+//     },
+//     android: // (optional) (object) — notification configuration specific to Android.
+//     {
+//       sound: true, // (optional) (boolean) — if true, play a sound. Default: false.
+//       //icon (optional) (string) — URL of icon to display in notification drawer.
+//       //color (optional) (string) — color of the notification icon in notification drawer.
+//       priority: 'high', // (optional) (min | low | high | max) — android may present notifications according to the priority, for example a high priority notification will likely to be shown as a heads-up notification.
+//       sticky: false, // (optional) (boolean) — if true, the notification will be sticky and not dismissable by user. The notification must be programmatically dismissed. Default: false.
+//       vibrate: true // (optional) (boolean or array) — if true, vibrate the device. An array can be supplied to specify the vibration pattern, e.g. - [ 0, 500 ].
+//       // link (optional) (string) — external link to open when notification is selected.
+//     }
+//   };
+
+//   const schedulingOptions = {
+//     time: t, // (date or number) — A Date object representing when to fire the notification or a number in Unix epoch time. Example: (new Date()).getTime() + 1000 is one second from now.
+//     repeat: repeat
+//   };
+
+//   Notifications.scheduleLocalNotificationAsync(localNotification, schedulingOptions);
+//   //Notifications.presentLocalNotificationAsync(localNotification)
+
+
+// }
+
+
 
   render(){
     return(
         <View style={styles.container}>
             <View style={{ paddingTop: 30 }}>
-
+            {/* <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                <TextInput
+                    onSubmitEditing={this.onSubmit}
+                    placeholder={'time in ms'}
+                />
+            </View>  */}
             {/** User Photo Stats**/}
             <View style={{ flexDirection: 'row' }}>
 
