@@ -1,6 +1,7 @@
-import React, {Component} from "react";
-import {View, Text, StyleSheet, TouchableWithoutFeedback, Keyboard, TextInput, Button, Dimensions, FlatList} from "react-native";
-import { Card, CardItem, Thumbnail, Body, Left, Right, Icon } from 'native-base';
+import React, { Component } from "react";
+import { View, Text, StyleSheet, TouchableWithoutFeedback, Keyboard, TextInput, Button, Dimensions, FlatList } from "react-native";
+import { Card, CardItem, Thumbnail, Body, Left } from 'native-base';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import firebase from './Firebase.js'
 
@@ -103,7 +104,11 @@ class ViewComment extends Component{
 
   render(){
     return(
-      <View style={styles.mainContainer}>
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        contentContainerStyle={styles.mainContainer}
+        scrollEnabled={false}
+      >
         <View style={styles.flatListContainer}>
           <FlatList
             ref={ (ref) => { this.flatList = ref; }}
@@ -131,29 +136,29 @@ class ViewComment extends Component{
             keyExtractor={(item, index) => item.key}
           />
         </View>
+        
         <View style={{ height: 100,flex: 1, flexDirection: 'row'}}>
-
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-              <View style={styles.container}>
-                <Thumbnail source={{uri: this.state.userProfilePicture}}/>
-                <TextInput
-                  ref={input => { this.textInput = input }}
-                  style={styles.textInput}
-                  placeholder="Add a comment..."
-                  autoCapitalize="none"
-                  onChangeText={comment => this.setState({ comment })}
-                  value={this.state.comment}
-                  multiline={true}
-                />
-                <Button
-                  title="Post"
-                  onPress={this.addComment}
-                  style={{ height: 100 }}
-                />
-              </View>
+            <View style={styles.container}>
+              <Thumbnail source={{uri: this.state.userProfilePicture}}/>
+              <TextInput
+                ref={input => { this.textInput = input }}
+                style={styles.textInput}
+                placeholder="Add a comment..."
+                autoCapitalize="none"
+                onChangeText={comment => this.setState({ comment })}
+                value={this.state.comment}
+                multiline={true}
+              />
+              <Button
+                title="Post"
+                onPress={this.addComment}
+                style={{ height: 100 }}
+              />
+            </View>
           </TouchableWithoutFeedback>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     )
   }
 }
