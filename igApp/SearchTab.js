@@ -6,17 +6,22 @@ import firebase from './Firebase.js'
 
 // reference to Users branch
 const usersRef = firebase.database().ref("Users/");
+// reference to Hashtag branch
+const hashtagRef = firebase.database().ref("Hashtag/");
 
 class SearchTab extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      userInfo: [],
-      foundUser: false,
+      userResults: [],
+      hashtagResults: [],
+      foundSearch: false,
+      hashtagMode: false,
     };
 
     this.allUsers = [];
+    this.allHashtags = [];
   }
 
   /*
@@ -36,6 +41,14 @@ class SearchTab extends Component {
     })
   }
 
+  getAllHashtags = () => {
+    hashtagRef.orderByKey().once("value", (snapshot) => {
+      snapshot.forEach((hashtagSnapshot) => {
+        this.allHashtags.push(hashtagSnapshot.key)
+      })
+    })
+  }
+
   /*
   Callback function for SearchBar's onChangeText prop.
   Performs a filter on @this.allUsers based on @text, which is provided by the
@@ -45,21 +58,43 @@ class SearchTab extends Component {
   */
   updateSearch = (text) => {
     this.props.navigation.setParams({searchText: text});
+    var newData
 
-    const newData = this.allUsers.filter(item => {
-      const itemData = `${item.username.toUpperCase()} ${item.firstName.toUpperCase()} ${item.lastName.toUpperCase()}`;
-      const textData = text.toUpperCase();
+    // Search posts by hashtag
+    if(text.startsWith('#')) {
+      this.setState({hashtagMode: true})
 
-      return itemData.indexOf(textData) > -1;
-    });
+      newData = this.allHashtags.filter(item => {
+        const itemData = item.toUpperCase()
+        const textData = text.substring(1).toUpperCase()
 
-    if (newData.length == 0 || text == "") {
-      this.setState({foundUser: false});
-    } else {
-      this.setState({foundUser: true});
+        return itemData.indexOf(textData) > -1
+      })
+    }
+    // Search users by username or first/last name
+    else {
+      this.setState({hashtagMode: false})
+
+      newData = this.allUsers.filter(item => {
+        const itemData = `${item.username.toUpperCase()} ${item.firstName.toUpperCase()} ${item.lastName.toUpperCase()}`;
+        const textData = text.toUpperCase();
+
+        return itemData.indexOf(textData) > -1;
+      });
     }
 
-    this.setState({userInfo: newData});
+    if (newData.length == 0 || text == "" || text == "#") {
+      this.setState({foundSearch: false});
+    } else {
+      this.setState({foundSearch: true});
+    }
+
+    // Update search results
+    if (this.state.hashtagMode) {
+      this.setState({hashtagResults: newData})
+    } else {
+      this.setState({userResults: newData});
+    }
 
   };
 
@@ -68,6 +103,7 @@ class SearchTab extends Component {
                                       searchText:         this.state.search,
                                       findUsernameParam:  this.findUsername});
     this.getAllUsers();
+    this.getAllHashtags();
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -103,7 +139,7 @@ class SearchTab extends Component {
           source={require('./assets/images/cancel.png')}
         />
      </TouchableOpacity>
-      
+
       )
     }
   };
@@ -122,16 +158,33 @@ class SearchTab extends Component {
   };
 
   render(){
-    if (!this.state.foundUser) {
+    if (!this.state.foundSearch) {
       return(
         <View style = {styles.container}>
-          <Text>No users found</Text>
+          <Text>No users or hashtags found</Text>
         </View>
+      )
+    }
+    if (this.state.hashtagMode) {
+      return(
+        <FlatList
+          data = {this.state.hashtagResults}
+          renderItem = {({item}) => (
+            <ListItem
+              title= {'#' + item}
+              // onPress={() => this.props.navigation.navigate('ProfileTabInSearch', { username: item.username })}
+              // leftAvatar={{ rounded: true, source: { uri: item.profilePic } }}
+              containerStyle={{ borderBottomWidth: 0 }}
+            />
+          )}
+         // keyExtractor={item}
+         ItemSeparatorComponent={this.renderSeparator}
+       />
       )
     }
     return(
       <FlatList
-        data = {this.state.userInfo}
+        data = {this.state.userResults}
         renderItem = {({item}) => (
           <ListItem
             title={item.username}
@@ -144,7 +197,7 @@ class SearchTab extends Component {
        keyExtractor={item => item.username}
        ItemSeparatorComponent={this.renderSeparator}
      />
-        )}
+    )}
 }
 
 export default SearchTab

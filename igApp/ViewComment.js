@@ -1,6 +1,19 @@
-import React, {Component} from "react";
-import {View, Text, StyleSheet, TouchableWithoutFeedback, Keyboard, TextInput, Button, FlatList} from "react-native";
+import React, { Component } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  Dimensions,
+  FlatList,
+  findNodeHandle } from "react-native";
 import { Card, CardItem, Thumbnail, Body, Left, Right, Icon } from 'native-base';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import firebase from './Firebase.js'
 
@@ -60,7 +73,7 @@ class ViewComment extends Component{
       })
     })
 
-    const wait = new Promise((resolve) => setTimeout(resolve, 1000));
+    const wait = new Promise((resolve) => setTimeout(resolve, 2000));
     wait.then( () => {
         this.flatList.scrollToEnd({ animated: true });
     });
@@ -103,8 +116,14 @@ class ViewComment extends Component{
 
   render(){
     return(
-      <View style={styles.mainContainer}>
-        <View style={{ height: 630 }}>
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        contentContainerStyle={styles.mainContainer}
+        scrollEnabled={false}
+        extraScrollHeight={Platform.OS === 'ios' ? 50 : -50}
+        enableOnAndroid={true}
+      >
+        <View style={styles.flatListContainer}>
           <FlatList
             ref={ (ref) => { this.flatList = ref; }}
             data = {this.state.comments}
@@ -115,11 +134,11 @@ class ViewComment extends Component{
                 <Card style={{ flex: 1}}>
                   <CardItem>
                     <Left>
-                        <Thumbnail source={{uri: item.profile_picture}} />
+                        <Thumbnail source={{uri: item.profile_picture}} style={{borderWidth: 2, borderColor:'#d3d3d3'}}/>
                         <Body>
                             <Text style={{ fontWeight: "900" }}>{item.username + " "} </Text>
                             <Text>{item.comment} </Text>
-                            <Text style={{color: 'gray'}}>{item.date}</Text>
+                            <Text style={{color: '#FFB6C1'}}>{item.date}</Text>
                         </Body>
                     </Left>
                   </CardItem>
@@ -131,52 +150,71 @@ class ViewComment extends Component{
             keyExtractor={(item, index) => item.key}
           />
         </View>
-        <View style={{ height: 100, flexDirection: 'row' }}>
-
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-              <View style={styles.container}>
-                <Thumbnail source={{uri: this.state.userProfilePicture}}/>
-                <TextInput
-                  ref={input => { this.textInput = input }}
-                  style={styles.textInput}
-                  placeholder="Add a comment..."
-                  autoCapitalize="none"
-                  onChangeText={comment => this.setState({ comment })}
-                  value={this.state.comment}
-                  multiline={true}
-                />
-                <Button
-                  title="Post"
-                  onPress={this.addComment}
-                  style={{ height: 100 }}
-                />
-              </View>
-          </TouchableWithoutFeedback>
+        <View style={styles.addCommentContainer}>
+          <Thumbnail source={{uri: this.state.userProfilePicture}} style={styles.profilePictureContainer}/>
+          <TextInput
+            ref={input => { this.textInput = input }}
+            style={styles.textInput}
+            placeholder="Add a comment..."
+            autoCapitalize="none"
+            onChangeText={comment => this.setState({ comment })}
+            value={this.state.comment}
+            multiline={true}
+          />
+          <TouchableOpacity onPress={this.addComment} style={styles.postButtonContainer}>
+            <Text styles={styles.buttonTextContainer}> Post </Text>
+          </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     )
   }
 }
 
 export default ViewComment
 
+const win = Dimensions.get('window');
+
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
+      flex: 1,
+
     },
     mainContainer: {
-        flex: 1,
+      flex: 1,
+      flexDirection: 'column',
+      justifyContent: 'space-between'
+    },
+    flatListContainer: {
+      flex: 5,
+    },
+    addCommentContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderColor:'#d3d3d3',
+      borderBottomWidth:1,
+      borderTopWidth:2
+    },
+    profilePictureContainer: {
+      marginTop: 5,
+      marginLeft: 5,
+      marginBottom: 5,
+      marginRight: 5,
+      borderWidth: 2,
+      borderColor:'#FFB6C1'
+    },
+    postButtonContainer: {
+      flex: 1
+    },
+    buttonTextContainer: {
+      color: '#FFB6C1'
     },
     textInput: {
-      height: 50,
-      width: 250,
+      flex: 6,
       borderColor: 'gray',
       backgroundColor:'#FFFFFF',
       borderWidth: 1,
-      marginTop: 10,
-      marginLeft: 10
+      borderColor: '#fff',
+      //marginLeft: 10
     }
 });

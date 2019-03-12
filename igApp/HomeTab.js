@@ -30,8 +30,7 @@ class HomeTab extends Component{
     feedPostsArray: [],
     commentsCountArray: [],
     likedPosts: [],
-    isFetching: false,
-    SampleProfilePic: ''
+    isFetching: false
   }
 
   getusersFollowing(){
@@ -178,12 +177,6 @@ class HomeTab extends Component{
     })
   }
 
-  setSampleProfilePic(){
-    firebase.database().ref('Users/userID1').on('value', (childSnapshot) => {
-      this.setState({SampleProfilePic: childSnapshot.val().profile_picture});
-    })
-  }
-
   async onRefresh(){
     console.log("Attempting to refresh");
     this.setState({isFetching: true})
@@ -195,7 +188,6 @@ class HomeTab extends Component{
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFeedPosts();
     await new Promise(resolve => { setTimeout(resolve, 200); });
-    this.setSampleProfilePic();
     this.setState({loaded: true});
 
 
@@ -294,7 +286,6 @@ class HomeTab extends Component{
       await new Promise(resolve => { setTimeout(resolve, 100); });
       this.getFeedPosts();
       await new Promise(resolve => { setTimeout(resolve, 100); });
-      this.setSampleProfilePic();
       this.setState({loaded: true});
 
       // Sleep for half a second
@@ -322,10 +313,10 @@ class HomeTab extends Component{
                 <Card style={{ height: 610 }}>
                   <CardItem>
                     <Left>
-                        <Thumbnail source={{uri: item.profile_picture}} />
+                        <Thumbnail source={{uri: item.profile_picture}} style={{borderWidth: 2, borderColor:'#d3d3d3'}}/>
                         <Body>
                             <Text style={{ fontWeight: "900" }}>{item.username} </Text>
-                            <Text style={{color: 'gray'}} note>{item.date}</Text>
+                            <Text style={{color: '#FFB6C1'}} note>{item.date}</Text>
                         </Body>
                     </Left>
                   </CardItem>
@@ -365,7 +356,7 @@ class HomeTab extends Component{
                         commentsObject: item.comments,
                         postID: item.key
                       })}>
-                        <Text style={{color: 'gray'}}>{"View " + item.commentsCount + " comments"} </Text>
+                        <Text style={{color: '#FFB6C1'}}>{"View " + item.commentsCount + " comments"} </Text>
                       </TouchableOpacity>
                     </Body>
                   </CardItem>
