@@ -1,5 +1,17 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Platform, TouchableWithoutFeedback, Keyboard, TouchableOpacity, TextInput, Button, Dimensions, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  Dimensions,
+  FlatList,
+  findNodeHandle } from "react-native";
 import { Card, CardItem, Thumbnail, Body, Left, Right, Icon } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -108,6 +120,8 @@ class ViewComment extends Component{
         resetScrollToCoords={{ x: 0, y: 0 }}
         contentContainerStyle={styles.mainContainer}
         scrollEnabled={false}
+        extraScrollHeight={Platform.OS === 'ios' ? 50 : -50}
+        enableOnAndroid={true}
       >
         <View style={styles.flatListContainer}>
           <FlatList
