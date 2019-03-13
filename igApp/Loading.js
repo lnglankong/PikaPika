@@ -1,19 +1,50 @@
 import React from 'react'
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, Text, ActivityIndicator, StyleSheet,AsyncStorage} from 'react-native'
 
 import firebase from './Firebase.js'
 
 export default class Loading extends React.Component {
-  componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
+  async componentDidMount() {
+    firebase.auth().onAuthStateChanged(async (user) => {
      // this.props.navigation.navigate(user ? 'Main' : 'Login')
      console.log("auth state changes")
+     var alreadyLoggedIn = await this.retrieveAuthToken()
      if(!user){
-      this.props.navigation.navigate('Login')}
+       
+       if (alreadyLoggedIn){ // if already logged in 
+        this.props.navigation.navigate('Main')
+       }else{
+          this.props.navigation.navigate('Login')
+       }
+      }
     })
 
-    this.props.navigation.navigate('Login')
+    var alreadyLoggedIn = await this.retrieveAuthToken()
+    if (alreadyLoggedIn){ // if already logged in 
+      this.props.navigation.navigate('Main')
+    }else{
+      this.props.navigation.navigate('Login')
+    }
 
+  }
+
+  retrieveAuthToken = async () => {
+    console.log('attempt  to retrieve')
+    try {
+      const value = await AsyncStorage.getItem('authToken');
+      console.log('retrieved the value, and the value is', value)
+      if (value !== null) {
+        // We have data!!
+        return true;
+       // return value
+      }else{
+        console.log('no value here!')
+        return false;
+      }
+    } 
+    catch (error) {
+      console.log(error)
+    }
   }
 
   render() {

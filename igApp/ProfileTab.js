@@ -1,12 +1,15 @@
 import React, {Component} from "react";
-import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList,Alert} from "react-native";
+import {View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, FlatList,Alert,AsyncStorage} from "react-native";
 import { Card, CardItem, Thumbnail, Body, Left, Right, Button, Icon } from 'native-base';
 import update from 'immutability-helper';
 import firebase from './Firebase';
-
+import { Constants,Permissions, Notifications } from 'expo';
+//import PushNotification from 'react-native-push-notification';
+import NotifService from './Notifications';
 
 //The reference to the root of the database, which is "Users"
 const rootRef = firebase.database().ref();
+
 
 class ProfileTab extends Component{
   constructor(props){
@@ -28,7 +31,8 @@ class ProfileTab extends Component{
       currentUser: '',
       commentsCountArray: [],
       comments: [],
-      follow:"Follow"
+      follow:"Follow",
+      LoggedInUserID:""
     }
   }
 
@@ -39,12 +43,16 @@ class ProfileTab extends Component{
       }else{
           this.handleUnFollow()
       }
+      console.log("I am in handle follow")
   }
 
   handleFollowing =() =>{
     //console.log(this.params.username)
-    var loginFile = require('./Login');
-    const followingRef = rootRef.child('Following/' + loginFile.loggedInUser);
+
+   // var loginFile = require('./Login');
+
+
+    const followingRef = rootRef.child('Following/' + this.state.LoggedInUserID);
 
 
     var userId
@@ -54,7 +62,7 @@ class ProfileTab extends Component{
         userId = snapshot.val();
         followerRef = rootRef.child('Followers/' + userId);
         followingRef.update({[userId]: true });
-        followerRef.update({[loginFile.loggedInUser]:true})
+        followerRef.update({[this.state.LoggedInUserID]:true})
         this.setState({follow:"Unfollow"})
 
     })
@@ -62,8 +70,9 @@ class ProfileTab extends Component{
 
   handleUnFollow =() =>{
     //console.log("I am in unfollow")
-    var loginFile = require('./Login');
-    const followingRef = rootRef.child('Following/' + loginFile.loggedInUser);
+    //var loginFile = require('./Login');
+
+    const followingRef = rootRef.child('Following/' + this.state.LoggedInUserID);
 
     var userId
     var followerRef
@@ -72,7 +81,7 @@ class ProfileTab extends Component{
         userId = snapshot.val();
         followerRef = rootRef.child('Followers/' + userId);
         followingRef.update({[userId]: null });
-        followerRef.update({[loginFile.loggedInUser]:null})
+        followerRef.update({[this.state.LoggedInUserID]:null})
         this.setState({follow:"Follow"})
 
     })
@@ -81,9 +90,10 @@ class ProfileTab extends Component{
   handleDelete =(postID) => {
     console.log("the photo is going to delete is " + postID)
 
-    var loginFile = require('./Login');
+    //var loginFile = require('./Login');
+
     const postRef = rootRef.child('Post/')
-    const postByUserIDRef = rootRef.child('PostByUserID/' + loginFile.loggedInUser)
+    const postByUserIDRef = rootRef.child('PostByUserID/' + this.state.LoggedInUserID)
 
     postRef.update({[postID]: null});
     postByUserIDRef.update({[postID]:null});
@@ -302,18 +312,38 @@ class ProfileTab extends Component{
     })
   }
 
+  retrieveAuthToken = async () => {
+    console.log('attempt  to retrieve')
+    try {
+      const value = await AsyncStorage.getItem('authToken');
+      console.log('retrieved the value, and the value is', value)
+      if (value !== null) {
+        // We have data!!
+        return value;
+       // return value
+      }else{
+        console.log('no value here!')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   async componentWillMount(){
 
     if (this.params == null){ // if the profile is for the login user
         //get logged-in user
-        var loginFile = require('./Login');
+       // var loginFile = require('./Login');
+       var userID = await this.retrieveAuthToken()
+       this.setState({LoggedInUserID:userID})
+       console.log('user id is ', this.state.LoggedInUserID)
+
 
         //get reference to the logged in user from database
-        const userRef = rootRef.child('Users/' + loginFile.loggedInUser);
-        const followingRef = rootRef.child('Following/' + loginFile.loggedInUser);
-        const followerRef = rootRef.child('Followers/' + loginFile.loggedInUser);
-        const postRef = rootRef.child('PostByUserID/' + loginFile.loggedInUser);
+        const userRef = rootRef.child('Users/' + this.state.LoggedInUserID);
+        const followingRef = rootRef.child('Following/' + this.state.LoggedInUserID);
+        const followerRef = rootRef.child('Followers/' + this.state.LoggedInUserID);
+        const postRef = rootRef.child('PostByUserID/' + this.state.LoggedInUserID);
 
         userRef.on("value", (childSnapshot) => {
           this.setState({
@@ -336,12 +366,13 @@ class ProfileTab extends Component{
             this.setState({postsNum:snapshot.numChildren() })
         })
 
-        this.getPostsByUserID(loginFile.loggedInUser);
+        this.getPostsByUserID(this.state.LoggedInUserID);
         await new Promise(resolve => { setTimeout(resolve, 100); });
 
     }
     else{ // if this profile is for other users
-        var loginFile = require('./Login');
+       // var loginFile = require('./Login');
+       this.setState({LoggedInUserID:await this.retrieveAuthToken()})
         var userId
          rootRef.child('Usernames/'+this.params.username).on("value",(snapshot) => {
             userId = snapshot.val();
@@ -354,7 +385,7 @@ class ProfileTab extends Component{
              const followerRef = rootRef.child('Followers/' + userId);
              const postRef = rootRef.child('PostByUserID/' + userId);
 
-             rootRef.child('Following/' + loginFile.loggedInUser +'/'+userId).once("value",snapshot => {
+             rootRef.child('Following/' + this.state.LoggedInUserID +'/'+userId).once("value",snapshot => {
                 if (snapshot.exists()){
                     this.setState({follow: 'Unfollow'});
                     //console.log("login user is following this user!");
@@ -400,13 +431,53 @@ class ProfileTab extends Component{
     await new Promise(resolve => { setTimeout(resolve, 400); });
     this.getFeedPosts();
     await new Promise(resolve => { setTimeout(resolve, 100); });
+
   }
+
+
+ handleNotification() {
+     console.warn('ok! got your notif');
+  }
+
+async obtainNotificationPermission(){
+  console.log("I am in obtain permission")
+  let permission = await Permissions.getAsync(Permissions.USER_FACING_NOTIFICATIONS);
+  console.log(permissions.status)
+  if (permissions.status !== 'granted'){
+    console.log(permissions.status)
+    permission = await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
+    if (permissions.status !== 'granted'){
+      Alert.alert('Permission not granted to show notifications')
+    }
+  }
+  return permission
+}
+
+async presentLocalNotification(){
+ // askPermissions()
+  Alert.alert('I am in present notification')
+  console.log("I am in present local notification")
+  await this.obtainNotificationPermission()
+  Notifications.presentLocalNotificationAsync({
+    title: "hello",
+    body:'I am here',
+    ios:{
+      sound: true
+    }
+  })
+}
+
 
   render(){
     return(
         <View style={styles.container}>
             <View style={{ paddingTop: 30 }}>
-
+            {/* <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                <TextInput
+                    onSubmitEditing={this.onSubmit}
+                    placeholder={'time in ms'}
+                />
+            </View>  */}
             {/** User Photo Stats**/}
             <View style={{ flexDirection: 'row' }}>
 

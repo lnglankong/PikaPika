@@ -8,7 +8,8 @@ import {
   FlatList,
   Button,
   TouchableOpacity,
-  ScrollView} from "react-native";
+  ScrollView,
+  AsyncStorage} from "react-native";
 import { Constants, AppLoading } from 'expo'
 import SafeAreaView from 'react-native-safe-area-view';
 import { withNavigation } from 'react-navigation';
@@ -33,14 +34,34 @@ class HomeTab extends Component{
     isFetching: false
   }
 
-  getusersFollowing(){
+
+  retrieveAuthToken = async () => {
+    console.log('attempt  to retrieve')
+    try {
+      const value = await AsyncStorage.getItem('authToken');
+      console.log('retrieved the value, and the value is', value)
+      if (value !== null) {
+        // We have data!!
+        return value;
+       // return value
+      }else{
+        console.log('no value here!')
+      }
+    } 
+    catch (error) {
+      console.log(error)
+    }
+  }
+
+  async getusersFollowing(){
 
     //get logged-in user
-    var loginFile = require('./Login');
+    var loggedInUserID = await this.retrieveAuthToken()
+    
 
     var usersFollowing = [];
 
-    firebase.database().ref('Following/' + loginFile.loggedInUser).once('value', (childSnapshot) => {
+    firebase.database().ref('Following/' + loggedInUserID).once('value', (childSnapshot) => {
 
       if(childSnapshot.exists()){ //if user is following people ... get the following IDs
 
