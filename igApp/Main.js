@@ -193,6 +193,21 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
 //   }
 // ));
 
+const LikesTabStackNavigator = createAppContainer(createStackNavigator(
+  {
+    LikesTab:{
+      screen: LikesTab,
+      navigationOptions: {
+        title: "Notifications",
+        headerStyle: {
+          backgroundColor: '#FFB6C1',
+        },
+        headerTitleStyle: { alignSelf: 'center', flex:1 },
+      }
+    }
+  }
+));
+
 const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
   {
     AddMediaTab:{
@@ -213,6 +228,7 @@ const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
     }
   },
 ));
+
 
 const AppTabNavigator = createAppContainer(createBottomTabNavigator(
     {
@@ -238,6 +254,9 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
             )}
       },
 
+      LikesTab: {
+        screen: LikesTabStackNavigator,
+      },
 
       ProfileTab: {
           screen: ProfileTabStackNavigator,
