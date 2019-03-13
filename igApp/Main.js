@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, Platform, Button,TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Image, Platform, Button,TouchableOpacity,AsyncStorage} from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer, HeaderBackButton, StackActions } from 'react-navigation'
 import { SearchBar } from 'react-native-elements';
 
@@ -13,6 +13,7 @@ import ViewComment from './ViewComment'
 import Login from './Login'
 import CreatePost from './CreatePost'
 import firebase from './Firebase.js'
+
 
 export default class Main extends React.Component {
 
@@ -54,7 +55,13 @@ export default class Main extends React.Component {
 //   }
 // }
 
-
+handleLoggedOut = async (navigation) => {
+  // clear the storage and authToken when logged out
+  console.log('attemp to logout')
+  await AsyncStorage.removeItem('authToken')
+  
+  firebase.auth().signOut().then(navigation.navigate("Login"))
+}
 
 const navigationOptionsEditProfile = ({ navigation }) => ({
     headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />,
@@ -97,7 +104,7 @@ const ProfileTabStackNavigator = createAppContainer(
         headerTitleStyle: { alignSelf: 'center', flex:1 },
         headerRight: (
           <TouchableOpacity
-            onPress={() => firebase.auth().signOut().then(navigation.navigate("Login"))}>
+            onPress={this.handleLoggedOut}>
             <Image
               style = {{width:35, height:35, marginRight:8}}
               source={require('./assets/images/logout.png')}

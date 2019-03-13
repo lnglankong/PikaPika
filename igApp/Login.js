@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, StyleSheet, Text, TextInput, View, TouchableWithoutFeedback, Keyboard} from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View, TouchableWithoutFeedback, Keyboard,AsyncStorage} from 'react-native'
 import { Button } from 'react-native-elements';
 
 import firebase from './Firebase.js'
@@ -47,7 +47,7 @@ export default class Login extends React.Component {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => this.props.navigation.navigate('Main'))
+      .then(() => this.storeAndLogin(email))
       .catch(error => this.setState({ errorMessage: error.message }))
 
     //find login ID of user by looping through all users in database
@@ -58,6 +58,44 @@ export default class Login extends React.Component {
         module.exports.email = email;
       });
   }
+
+  async storeItem(key, item) {
+    try {
+        console.log('I am storing')
+        //we want to wait for the Promise returned by AsyncStorage.setItem()
+        //to be resolved to the actual value before returning the value
+        var jsonOfItem = await AsyncStorage.setItem(key, JSON.stringify(item));
+        return jsonOfItem;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  
+  storeData = async (key,value) => {
+    try {
+      console.log('recording the data')
+      await AsyncStorage.setItem(key, value);
+      this.props.navigation.navigate('Main')
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  storeAndLogin = (email) =>{
+
+    var userId
+    console.log('I am in store and login function ');
+    userRef.orderByChild("email").equalTo(email).on("child_added", function(snapshot) {
+      console.log('I am in firebase')
+     userId = snapshot.key
+    })
+    this.storeData("authToken",userId)
+    
+   // this.props.navigation.navigate('Main')
+  }
+
+
 
   render() {
     return (
