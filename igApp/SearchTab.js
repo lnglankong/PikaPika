@@ -172,12 +172,12 @@ class SearchTab extends Component {
           renderItem = {({item}) => (
             <ListItem
               title= {'#' + item}
-              // onPress={() => this.props.navigation.navigate('ProfileTabInSearch', { username: item.username })}
+              onPress={() => this.props.navigation.navigate('HashtagTab', { hashtag: item })}
               // leftAvatar={{ rounded: true, source: { uri: item.profilePic } }}
               containerStyle={{ borderBottomWidth: 0 }}
             />
           )}
-         // keyExtractor={item}
+         // keyExtractor={item => item}
          ItemSeparatorComponent={this.renderSeparator}
        />
       )

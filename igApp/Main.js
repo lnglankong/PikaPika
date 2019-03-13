@@ -8,6 +8,7 @@ import HomeTab from './HomeTab'
 import LikesTab from './LikesTab'
 import ProfileTab from './ProfileTab'
 import SearchTab from './SearchTab'
+import HashtagTab from './HashtagTab'
 import EditProfile from './EditProfile'
 import ViewComment from './ViewComment'
 import Login from './Login'
@@ -161,19 +162,23 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
       screen: SearchTab
       },
 
-      ProfileTabInSearch:{ // view for profile
-        screen: ProfileTab,
-        navigationOptionsOtherProfile,
-        navigationOptions:{
-          headerTitleStyle: { alignSelf: 'center', flex:1},
-          headerStyle: {
-            backgroundColor:'#FFB6C1',
-          },
-          title: 'Profile',
-        }
+    ProfileTabInSearch:{ // view for profile
+      screen: ProfileTab,
+      navigationOptionsOtherProfile,
+      navigationOptions:{
+        headerTitleStyle: { alignSelf: 'center', flex:1},
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+        title: 'Profile',
       }
+    },
 
-    }
+    HashtagTab:{
+      screen: HashtagTab
+    },
+
+  }
 
 
 ));
@@ -222,7 +227,7 @@ const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
       }
     },
 
-    CreatePost:{ 
+    CreatePost:{
       screen: CreatePost,
       navigationOptionsCreatePost
     }
