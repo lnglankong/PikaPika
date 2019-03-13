@@ -169,7 +169,6 @@ class HomeTab extends Component{
 
           //... get the post information
           feedList.push({
-<<<<<<< HEAD
                caption: post.val().caption,
                commments: post.val().comments,
                date: post.val().date,
@@ -182,21 +181,6 @@ class HomeTab extends Component{
                userLiked: liked,
                postIndex: postCount,
                key: post.key,
-=======
-              caption: post.val().caption,
-              commments: post.val().comments,
-              date: post.val().date,
-              hashtag: post.val().hashtag,
-              picture: post.val().picture,
-              username: username,
-              likes: post.val().likes,
-              commentsCount: this.state.commentsCountArray[postCount],
-              profile_picture: profilePicture,
-              likesPicture: likesPicture,
-              userLiked: liked,
-              postIndex: postCount,
-              key: post.key,
->>>>>>> 062e0e272cab86597b1892cf5a993fbce6227091
           });
 
 

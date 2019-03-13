@@ -38,7 +38,8 @@ class CreatePost extends Component{
     // Hashtag feature
     var tokens = this.state.caption.split(' ')
     for (var i in tokens) {
-      if(tokens[i].startsWith('#')) {
+      if(tokens[i].startsWith('#') && tokens[i].length > 1) {
+        // hashtags cannot contain ".", "#", "$", "[", or "]"
         // add hashtag to Hashtag branch
         firebase.database().ref().child('Hashtag/' + tokens[i].substring(1) + '/' + postID.key).set(true);
       }
@@ -85,8 +86,8 @@ const styles = StyleSheet.create({
       justifyContent: 'center'
     },
     picture: {
-      height: 370, 
-      width: 370, 
+      height: 370,
+      width: 370,
       marginTop: 10,
       borderRadius: 20,
     },
