@@ -71,7 +71,7 @@ export default class Login extends React.Component {
     }
   }
 
-  
+
   storeData = async (key,value) => {
     try {
       console.log('recording the data')
@@ -91,7 +91,7 @@ export default class Login extends React.Component {
      userId = snapshot.key
     })
     this.storeData("authToken",userId)
-    
+
    // this.props.navigation.navigate('Main')
   }
 

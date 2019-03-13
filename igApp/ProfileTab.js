@@ -32,7 +32,8 @@ class ProfileTab extends Component{
       commentsCountArray: [],
       comments: [],
       follow:"Follow",
-      LoggedInUserID:""
+      LoggedInUserID:"",
+      profilePicture: '',
     }
   }
 
@@ -347,7 +348,7 @@ class ProfileTab extends Component{
 
         userRef.on("value", (childSnapshot) => {
           this.setState({
-              displayName: childSnapshot.val().first_name + " " + childSnapshot.val().last_name,
+              displayName: childSnapshot.val().username,
               profilePicture: childSnapshot.val().profile_picture,
               displayBio: childSnapshot.val().biography,
           })
@@ -518,7 +519,9 @@ async presentLocalNotification(){
                                     {this.state.follow}
                                 </Text>
                             </TouchableOpacity>:
-                        <TouchableOpacity style={styles.editBackground} onPress={() => this.props.navigation.navigate('EditProfile')}>
+                        <TouchableOpacity style={styles.editBackground} onPress={() => this.props.navigation.navigate('EditProfile', {
+                          profilePicture: this.state.profilePicture,
+                        })}>
                             <Text style={{color: "black",textAlign:'center', fontFamily:'Chalkboard SE'}}>
                                 Edit Profile
                             </Text>
