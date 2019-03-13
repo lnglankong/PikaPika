@@ -42,12 +42,16 @@ class HomeTab extends Component{
       console.log('retrieved the value, and the value is', value)
       if (value !== null) {
         // We have data!!
+
+        //export the userID, email, and password of logged in user.
+        module.exports.loggedInUser = value;
+
         return value;
        // return value
       }else{
         console.log('no value here!')
       }
-    } 
+    }
     catch (error) {
       console.log(error)
     }
@@ -57,7 +61,7 @@ class HomeTab extends Component{
 
     //get logged-in user
     var loggedInUserID = await this.retrieveAuthToken()
-    
+
 
     var usersFollowing = [];
 
@@ -69,6 +73,7 @@ class HomeTab extends Component{
 
         followingKeys.forEach((currentFollowingUserID) => {
           usersFollowing.push(currentFollowingUserID);
+          console.log("USER IS FOLLOWING: " + currentFollowingUserID)
         })
         this.setState({usersFollowing: usersFollowing});
       }
@@ -170,19 +175,19 @@ class HomeTab extends Component{
 
           //... get the post information
           feedList.push({
-               caption: post.val().caption,
-               commments: post.val().comments,
-               date: post.val().date,
-               hashtag: post.val().hashtag,
-               picture: post.val().picture,
-               username: username,
-               likes: post.val().likes,
-               commentsCount: this.state.commentsCountArray[postCount],
-               profile_picture: profilePicture,
-               likesPicture: likesPicture,
-               userLiked: liked,
-               postIndex: postCount,
-               key: post.key,
+              caption: post.val().caption,
+              commments: post.val().comments,
+              date: post.val().date,
+              hashtag: post.val().hashtag,
+              picture: post.val().picture,
+              username: username,
+              likes: post.val().likes,
+              commentsCount: this.state.commentsCountArray[postCount],
+              profile_picture: profilePicture,
+              likesPicture: likesPicture,
+              userLiked: liked,
+              postIndex: postCount,
+              key: post.key,
           });
 
 
@@ -204,7 +209,7 @@ class HomeTab extends Component{
     this.getusersFollowing();
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFollowingPosts();
-    await new Promise(resolve => { setTimeout(resolve, 100); });
+    await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getComments();
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFeedPosts();
@@ -253,7 +258,7 @@ class HomeTab extends Component{
       //add post ID to list of user's liked posts in state
       var likesArray = this.state.likedPosts;
       likesArray.push(item.key);
-      this.setState({likesPosts: likesArray});
+      this.setState({likedPosts: likesArray});
 
     }else{ //already liked
       item.userLiked = false
@@ -300,22 +305,22 @@ class HomeTab extends Component{
       //this.getActivityFeedPosts();
 
       this.getusersFollowing();
-      await new Promise(resolve => { setTimeout(resolve, 100); });
+      await new Promise(resolve => { setTimeout(resolve, 200); });
       this.getFollowingPosts();
-      await new Promise(resolve => { setTimeout(resolve, 100); });
+      await new Promise(resolve => { setTimeout(resolve, 200); });
       this.getComments();
-      await new Promise(resolve => { setTimeout(resolve, 100); });
+      await new Promise(resolve => { setTimeout(resolve, 200); });
       this.getFeedPosts();
-      await new Promise(resolve => { setTimeout(resolve, 100); });
+      await new Promise(resolve => { setTimeout(resolve, 200); });
       this.setState({loaded: true});
 
       // Sleep for half a second
-      await new Promise(resolve => { setTimeout(resolve, 100); });
+      await new Promise(resolve => { setTimeout(resolve, 200); });
 
       this.setState(this.state.feedPosts);
 
       // Sleep for half a second
-      await new Promise(resolve => { setTimeout(resolve, 500); });
+      await new Promise(resolve => { setTimeout(resolve, 200); });
     }
   }
 

@@ -35,7 +35,7 @@ class ViewComment extends Component{
 
   getCommentData(){
 
-    const loginFile = require('./Login');
+    const loginFile = require('./HomeTab');
 
     //get reference to the logged in user from database
     firebase.database().ref('Users/' + loginFile.loggedInUser).once('value', (childSnapshot) => {
@@ -162,7 +162,7 @@ class ViewComment extends Component{
             multiline={true}
           />
           <TouchableOpacity onPress={this.addComment} style={styles.postButtonContainer}>
-            <Text styles={styles.buttonTextContainer}> Post </Text>
+            <Text style={styles.buttonTextContainer}> Post </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
