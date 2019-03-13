@@ -102,6 +102,7 @@ class ProfileTab extends Component{
     postRef.update({[postID]: null});
     postByUserIDRef.update({[postID]:null});
 
+    this.onRefresh(this.state.LoggedInUserID)
   }
 
   handleLikePress(item){
