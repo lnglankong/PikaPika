@@ -47,7 +47,7 @@ class HomeTab extends Component{
       }else{
         console.log('no value here!')
       }
-    } 
+    }
     catch (error) {
       console.log(error)
     }
@@ -57,7 +57,7 @@ class HomeTab extends Component{
 
     //get logged-in user
     var loggedInUserID = await this.retrieveAuthToken()
-    
+
 
     var usersFollowing = [];
 
