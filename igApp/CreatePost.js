@@ -4,6 +4,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import firebase from './Firebase.js'
 
+
 class CreatePost extends Component{
   //snapshot of image uri is in prop picture
 
@@ -15,6 +16,7 @@ class CreatePost extends Component{
   componentDidMount(){
     //get logged-in user
     const loginFile = require('./HomeTab');
+    console.log('user id is ', loginFile.loggedInUser)
 
     //get reference to the logged in user from database
     const userRef = firebase.database().ref().child('Users/' + loginFile.loggedInUser);

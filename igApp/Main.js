@@ -119,11 +119,21 @@ const ProfileTabStackNavigator = createAppContainer(
 
     EditProfile:{ // view for edit profile, which is inside profile view
       screen: EditProfile,
-      navigationOptionsEditProfile
+      navigationOptionsEditProfile,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
     },
     ViewComment:{ // show comments of a post
       screen: ViewComment,
-      navigationOptionsViewComment
+      navigationOptionsViewComment,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
     }
 
   }
@@ -155,7 +165,12 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
 
     ViewComment:{ // show comments of a post
       screen: ViewComment,
-      navigationOptionsViewComment
+      navigationOptionsViewComment,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
     },
 
     SearchTab:{
@@ -229,7 +244,12 @@ const AddMediaTabStackNavigator = createAppContainer(createStackNavigator(
 
     CreatePost:{
       screen: CreatePost,
-      navigationOptionsCreatePost
+      navigationOptionsCreatePost,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
     }
   },
 ));
