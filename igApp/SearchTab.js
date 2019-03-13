@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {View, Text, Image, StyleSheet, FlatList, TouchableOpacity} from "react-native";
+import {View, Text, Image, StyleSheet, FlatList, TouchableOpacity,TouchableWithoutFeedback,Keyboard} from "react-native";
 import {SearchBar, ListItem} from 'react-native-elements';
 
 import firebase from './Firebase.js'
@@ -114,8 +114,8 @@ class SearchTab extends Component {
           value={navigation.getParam('searchText')}
           inputStyle={{backgroundColor: 'white'}}
           searchIcon={false}
-          inputContainerStyle={{backgroundColor: 'white', width: '100%', height:'90%', flex:1, marginTop:-1}}
-          containerStyle={{backgroundColor: 'white', borderWidth: 1.5, borderRadius: 15, width: '100%', height:'95%'}}
+          inputContainerStyle={{backgroundColor: 'white', width: '100%', height:'90%', flex:1, marginTop:-4}}
+          containerStyle={{backgroundColor: 'white', borderWidth: 1.5, borderRadius: 15, width: '90%', height:'90%'}}
           placeholder={'Search'}
           keyboardType = {'web-search'}
           autoCorrect={false}
@@ -124,23 +124,23 @@ class SearchTab extends Component {
         backgroundColor:'#FFB6C1',
       },
       headerTitleStyle: { alignSelf: 'auto' },
-      headerLeft:(
-       // <HeaderBackButton onPress={() => navigation.goBack(null)}/>
-       <Image
-       style = {{width:41, height:41,marginLeft:8, marginBottom:8}}
-       source={require('./assets/images/search_colored.png')}
-     />
-      ),
-      headerRight:(
-        <TouchableOpacity
-        onPress={() =>navigation.goBack(null)}>
-        <Image
-          style = {{width:20, height:20, marginRight:15,marginBottom:5}}
-          source={require('./assets/images/cancel.png')}
-        />
-     </TouchableOpacity>
+    //   headerLeft:(
+    //    // <HeaderBackButton onPress={() => navigation.goBack(null)}/>
+    //    <Image
+    //    style = {{width:41, height:41,marginLeft:8, marginBottom:8}}
+    //    source={require('./assets/images/search_colored.png')}
+    //  />
+    // //   ),
+    //   headerRight:(
+    //     <TouchableOpacity
+    //     onPress={() =>navigation.goBack(null)}>
+    //     <Image
+    //       style = {{width:20, height:20, marginRight:15,marginBottom:5}}
+    //       source={require('./assets/images/cancel.png')}
+    //     />
+    //  </TouchableOpacity>
 
-      )
+    //   )
     }
   };
 
@@ -157,12 +157,15 @@ class SearchTab extends Component {
     );
   };
 
+
   render(){
     if (!this.state.foundSearch) {
       return(
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style = {styles.container}>
           <Text>No users or hashtags found</Text>
         </View>
+        </TouchableWithoutFeedback>
       )
     }
     if (this.state.hashtagMode) {
