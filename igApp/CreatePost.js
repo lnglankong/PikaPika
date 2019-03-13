@@ -14,7 +14,7 @@ class CreatePost extends Component{
 
   componentDidMount(){
     //get logged-in user
-    const loginFile = require('./Login');
+    const loginFile = require('./HomeTab');
 
     //get reference to the logged in user from database
     const userRef = firebase.database().ref().child('Users/' + loginFile.loggedInUser);

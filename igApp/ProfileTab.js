@@ -52,9 +52,7 @@ class ProfileTab extends Component{
 
    // var loginFile = require('./Login');
 
-
     const followingRef = rootRef.child('Following/' + this.state.LoggedInUserID);
-
 
     var userId
     var followerRef
@@ -65,7 +63,12 @@ class ProfileTab extends Component{
         followingRef.update({[userId]: true });
         followerRef.update({[this.state.LoggedInUserID]:true})
         this.setState({follow:"Unfollow"})
+    })
 
+    //add notification to Notifications branch
+    rootRef.child('Notifications/' + userId).push({
+      'action': 'follow',
+      'follower': this.state.LoggedInUserID,
     })
   }
 
