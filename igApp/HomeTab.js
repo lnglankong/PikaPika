@@ -82,7 +82,6 @@ class HomeTab extends Component{
         if(this.state.followingPosts.includes(post.key)){
           var commentsCount = 0;
 
-          //get profile picture of poster
           firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
 
             childSnapshot.forEach((comment) => {
@@ -113,7 +112,6 @@ class HomeTab extends Component{
           let username = '';
           let profilePicture = '';
           let commentsCount = '';
-          let snapshotSave = '';
 
           //get profile picture of poster
           firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
@@ -125,13 +123,9 @@ class HomeTab extends Component{
             })*/
           })
 
-          //get username of poster
+          //get username and profile picture of poster
           firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
             username = childSnapshot.val().username;
-          })
-
-          //get profile picture of poster
-          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
             profilePicture = childSnapshot.val().profile_picture;
           })
 
@@ -152,7 +146,6 @@ class HomeTab extends Component{
                caption: post.val().caption,
                commments: post.val().comments,
                date: post.val().date,
-               hashtag: post.val().hashtag,
                picture: post.val().picture,
                username: username,
                likes: post.val().likes,
