@@ -144,6 +144,7 @@ const ProfileTabStackNavigator = createAppContainer(
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
+        title: 'Followers',
       }
     },
 
@@ -153,7 +154,9 @@ const ProfileTabStackNavigator = createAppContainer(
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
-      }
+        title: 'Following',
+      },
+      
     }
 
   }
@@ -264,6 +267,7 @@ const SearchTabStackNavigator = createAppContainer(createStackNavigator(
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
+        title: 'Followers',
       }
     },
 
@@ -273,6 +277,7 @@ const SearchTabStackNavigator = createAppContainer(createStackNavigator(
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
+        title: 'Following',
       }
     }
 
