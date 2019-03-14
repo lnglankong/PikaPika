@@ -31,7 +31,6 @@ class ViewComment extends Component{
     userProfilePicture: "",
     isFetching: false,
     comments: [],
-    LoggedInUserID: "",
   };
 
   getCommentData(){
