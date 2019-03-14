@@ -34,51 +34,67 @@ class LikesTab extends Component{
   }
  */
 
-  componentDidMount(){
-    console.log("hello");
-
+  async componentDidMount(){
     const loginFile = require('./HomeTab');
 
     //get reference to the logged in user from database
-    const userRef = firebase.database().ref().child('Users/' + loginFile.loggedInUser);
+    const userRef = await firebase.database().ref().child('Users/' + loginFile.loggedInUser);
     this.setState({ LoggedInUserID: userRef.key });
-    console.log('userrefkey', userRef.key);
-    console.log('user id is ', this.state.LoggedInUserID);
 
-    firebase.database().ref('Notifications/' + userRef.key).once('value', (childSnapshot) => {
-      console.log("I have notifications")
-      //if(childSnapshot.exists()){
+    firebase.database().ref('Notifications/' + userRef.key).once('value', async (childSnapshot) => {
+      if(childSnapshot.exists()){
         var notificationsArray = [];
-        var followerUsername = "";
-        var followerProfilePicture = "";
 
         childSnapshot.forEach((notification) => {
-          //get username and profile picture of new follower
-          firebase.database().ref('Users/' + notification.val().follower).once('value', (snapshot) => {
-            followerUsername = snapshot.val().username;
-            followerProfilePicture = snapshot.val().profile_picture;
-          
-            notificationsArray.push({
-              action: "follow",
-              actor: followerUsername,
-              actorImage: followerProfilePicture,
-              notifKey: notification.key,
+          console.log("notif", notification.val());
+          if (notification.val().action === "follow") {
+            //get username and profile picture of new follower
+            firebase.database().ref('Users/' + notification.val().follower).once('value', async (snapshot) => {
+              await notificationsArray.push({
+                action: "follow",
+                actor: snapshot.val().username,
+                actorImage: snapshot.val().profile_picture,
+                notifKey: notification.key,
+              })
+              
+              console.log("push follow");
+              this.setState({notifications: notificationsArray});
             })
-  
-            this.setState({notifications: notificationsArray});
-          })
+          }
+          else if (notification.val().action === "like") {
+            //get username and profile picture of new follower
+            firebase.database().ref('Users/' + notification.val().liker).once('value', (userSnapshot) => {
+              firebase.database().ref('Post/' + notification.val().likedPost).once('value', async (postSnapshot) => {
+                await notificationsArray.push({
+                  action: "like",
+                  actor: userSnapshot.val().username,
+                  actorImage: userSnapshot.val().profile_picture,
+                  notifKey: notification.key,
+                  postImage: postSnapshot.val().picture,
+                });
+                console.log("push like");
+
+                //this.setState({notifications: notificationsArray});
+                //notif = this.state.notifications[0];
+                //console.log("notifications[0].notifKey", notif.action);
+                let sortedNotifications = notificationsArray.sort((a, b) => {
+                  return b.actor - a.actor;
+                });
+                this.setState({notifications: sortedNotifications});
+              })
+            })
+          }
         })
-     // }
+      }
     })
   }
 
-  render(){
-    return(
-      <View style={styles.flatListContainer}>
-      <FlatList
-        data = {this.state.notifications}
-        renderItem={({item}) =>
-          <View>
+  // return different jsx depending on if notif is follow, like, or comment
+  renderItem = ({item}) => {
+    //console.log(item.action);
+    if(item.action === "follow") {
+      return (
+        <View>
             <Card style={{ flex: 1}}>
               <CardItem>
                 <Left>
@@ -93,9 +109,46 @@ class LikesTab extends Component{
 
             </Card>
           </View>
-        }
-        /*  { this.renderCard*/
-        keyExtractor={(item, index) => item.key}
+      )
+    }
+    else if (item.action === "like") {
+      return (
+        <View>
+            <Card style={{ flex: 1}}>
+              <CardItem>
+                <Left>
+                    <Thumbnail source={{uri: item.actorImage}} style={{borderWidth: 2, borderColor:'#d3d3d3'}}/>
+                    <Body>
+                        <Text style={{ fontWeight: "900" }}>{item.actor + " "} </Text>
+                        <Text>liked your post.</Text>
+                        <Text style={{color: '#FFB6C1'}}>{item.date}</Text>
+                    </Body>
+                    <Thumbnail source={{uri: item.postImage}} style={{borderColor:'#d3d3d3'}}/>
+                </Left>
+              </CardItem>
+
+            </Card>
+          </View>
+      )
+    }
+  }
+
+  render(){
+    console.log("notifications array", this.state.notifications);
+    //notif = this.state.notifications[0];
+    //console.log("notifications[0].notifKey", notif.val());
+    /*
+    let sortedNotifications = this.state.notifications.sort((a, b) => {
+      return b.actor - a.actor;
+    });
+    console.log('sortedNotifs:', sortedNotifications);
+    */
+    return(
+      <View style={styles.flatListContainer}>
+      <FlatList
+        data = {this.state.notifications.sort((a, b) => a.notifKey.localeCompare(b.notifKey)).reverse()}
+        renderItem={this.renderItem}
+        keyExtractor={(item, index) => item.notifKey}
       />
     </View>
     )

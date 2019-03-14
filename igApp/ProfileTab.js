@@ -65,8 +65,8 @@ class ProfileTab extends Component{
         this.setState({follow:"Unfollow"})
     })
 
-    //add notification to Notifications branch
-    rootRef.child('Notifications/' + userId).push({
+    //add a "follow" notification to Notifications branch
+    rootRef.child('Notifications/' + userId +'/' + Date.now()).update({
       'action': 'follow',
       'follower': this.state.LoggedInUserID,
     })
@@ -128,19 +128,27 @@ class ProfileTab extends Component{
         })
       })
 
-      //update new amount of likes on firebase
+      //update firebase posts branch and notification branch with new likes
       firebase.database().ref("Post/" + item.key).once('value', (snapshot) =>{
+        //update new amount of likes on firebase
         let currentLikes = snapshot.val().likes + 1;
-
         const postRef = rootRef.child('Post/' + item.key);
         postRef.update({likes: currentLikes});
-      })
 
+        //add a "like" notification to Notifications branch
+        const likedPostUserID = snapshot.val().userID;
+        rootRef.child('Notifications/' + likedPostUserID + '/' + Date.now()).update({
+          'action': 'like',
+          'liker': this.state.LoggedInUserID,
+          'likedPost': item.key,
+        })
+      })
       //add post ID to list of user's liked posts in state
       var likesArray = this.state.likedPosts;
       likesArray.push(item.key);
       this.setState({likesPosts: likesArray});
 
+      
     }else{ //already liked
       item.userLiked = false
 

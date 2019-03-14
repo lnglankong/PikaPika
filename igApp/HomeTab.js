@@ -31,7 +31,8 @@ class HomeTab extends Component{
     feedPostsArray: [],
     commentsCountArray: [],
     likedPosts: [],
-    isFetching: false
+    isFetching: false,
+    LoggedInUserID: "",
   }
 
 
@@ -60,7 +61,8 @@ class HomeTab extends Component{
   async getusersFollowing(){
 
     //get logged-in user
-    var loggedInUserID = await this.retrieveAuthToken()
+    var loggedInUserID = await this.retrieveAuthToken();
+    this.setState({LoggedInUserID: loggedInUserID});
 
 
     var usersFollowing = [];
@@ -240,12 +242,20 @@ class HomeTab extends Component{
         })
       })
 
-      //update new amount of likes on firebase
+      //update firebase posts branch and notification branch with new likes
       firebase.database().ref("Post/" + item.key).once('value', (snapshot) =>{
+        //update new amount of likes on firebase
         let currentLikes = snapshot.val().likes + 1;
-
         const postRef = rootRef.child('Post/' + item.key);
         postRef.update({likes: currentLikes});
+
+        //add a "like" notification to Notifications branch
+        const likedPostUserID = snapshot.val().userID;
+        rootRef.child('Notifications/' + likedPostUserID + '/' + Date.now()).update({
+          'action': 'like',
+          'liker': this.state.LoggedInUserID,
+          'likedPost': item.key,
+        })
       })
 
       //add post ID to list of user's liked posts in state
