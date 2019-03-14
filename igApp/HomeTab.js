@@ -75,7 +75,6 @@ class HomeTab extends Component{
 
         followingKeys.forEach((currentFollowingUserID) => {
           usersFollowing.push(currentFollowingUserID);
-          console.log("USER IS FOLLOWING: " + currentFollowingUserID)
         })
         this.setState({usersFollowing: usersFollowing});
       }
@@ -102,7 +101,7 @@ class HomeTab extends Component{
   }
 
   getComments(){
-    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+    firebase.database().ref('Post/').once('value', (snapshot) => {
 
       var commentsList = [];
       snapshot.forEach((post) => {
@@ -126,7 +125,8 @@ class HomeTab extends Component{
   getFeedPosts(){
     //Get the all the posts from the current postID
 
-    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+    //firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+    firebase.database().ref('Post/').once('value', (snapshot) => {
 
       var feedList = [];
 
@@ -199,7 +199,6 @@ class HomeTab extends Component{
   }
 
   async onRefresh(){
-    console.log("Attempting to refresh");
     this.setState({isFetching: true})
     this.getusersFollowing();
     await new Promise(resolve => { setTimeout(resolve, 200); });
@@ -209,11 +208,15 @@ class HomeTab extends Component{
     await new Promise(resolve => { setTimeout(resolve, 200); });
     this.getFeedPosts();
     await new Promise(resolve => { setTimeout(resolve, 200); });
-    this.setState({loaded: true});
+
+    //reverse order of posts
+    var feedList = this.state.feedPostsArray;
+    feedList.reverse();
+    this.setState({feedPostsArray: feedList, loaded: true});
 
 
     // Sleep for half a second
-    await new Promise(resolve => { setTimeout(resolve, 200); });
+    await new Promise(resolve => { setTimeout(resolve, 500); });
 
     this.setState(this.state.feedPosts);
     this.setState({isFetching: false});
@@ -308,22 +311,21 @@ class HomeTab extends Component{
       //this.getActivityFeedPosts();
 
       this.getusersFollowing();
-      await new Promise(resolve => { setTimeout(resolve, 200); });
+      await new Promise(resolve => { setTimeout(resolve, 500); });
       this.getFollowingPosts();
-      await new Promise(resolve => { setTimeout(resolve, 200); });
+      await new Promise(resolve => { setTimeout(resolve, 500); });
       this.getComments();
-      await new Promise(resolve => { setTimeout(resolve, 200); });
+      await new Promise(resolve => { setTimeout(resolve, 500); });
       this.getFeedPosts();
-      await new Promise(resolve => { setTimeout(resolve, 200); });
-      this.setState({loaded: true});
+      await new Promise(resolve => { setTimeout(resolve, 500); });
+
+      //reverse order of posts
+      var feedList = this.state.feedPostsArray;
+      feedList.reverse();
+      this.setState({feedPostsArray: feedList, loaded: true});
 
       // Sleep for half a second
-      await new Promise(resolve => { setTimeout(resolve, 200); });
-
-      this.setState(this.state.feedPosts);
-
-      // Sleep for half a second
-      await new Promise(resolve => { setTimeout(resolve, 200); });
+      await new Promise(resolve => { setTimeout(resolve, 500); });
     }
   }
 

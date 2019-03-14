@@ -193,10 +193,17 @@ class ProfileTab extends Component{
 
     this.getPostsByUserID(userID)
     await new Promise(resolve => { setTimeout(resolve, 100); });
-    this.getFeedPosts()
-    await new Promise(resolve => { setTimeout(resolve, 100); });
     this.getComments()
     await new Promise(resolve => { setTimeout(resolve, 100); });
+    this.getFeedPosts()
+    await new Promise(resolve => { setTimeout(resolve, 100); });
+
+    //reverse order of posts
+    var feedList = this.state.posts;
+    feedList.reverse();
+    this.setState({posts: feedList, loaded: true});
+
+
     this.setState({isFetching: false});
   }
 
@@ -218,7 +225,8 @@ class ProfileTab extends Component{
   }
 
   getComments(){
-    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+    //firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+    firebase.database().ref('Post/').once('value', (snapshot) => {
 
       var commentsCountList = []; //array of # of comments per post
       var commentsList = []; //array of comment snapshots per post
@@ -250,7 +258,8 @@ class ProfileTab extends Component{
 
   getFeedPosts(){
     //Get the all the posts from the current postID
-    firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+    //firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
+    firebase.database().ref('Post/').once('value', (snapshot) => {
       //this.state.feedPosts.push(post);
       var feedList = [];
 
@@ -445,6 +454,10 @@ class ProfileTab extends Component{
     this.getFeedPosts();
     await new Promise(resolve => { setTimeout(resolve, 100); });
 
+    //reverse order of posts
+    var feedList = this.state.posts;
+    feedList.reverse();
+    this.setState({posts: feedList, loaded: true});
   }
 
 

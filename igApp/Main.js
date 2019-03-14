@@ -151,15 +151,15 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
           backgroundColor:'#FFB6C1',
         },
         headerTitleStyle: { alignSelf: 'center', flex:1 },
-        headerRight: (
-          <TouchableOpacity
-            onPress={() =>navigation.navigate('SearchTab')}>
-            <Image
-              style = {{width:41, height:41, marginRight:8}}
-              source={require('./assets/images/search.png')}
-            />
-         </TouchableOpacity>
-        ),
+        // headerRight: (
+        //   <TouchableOpacity
+        //     onPress={() =>navigation.navigate('SearchTab')}>
+        //     <Image
+        //       style = {{width:41, height:41, marginRight:8}}
+        //       source={require('./assets/images/search.png')}
+        //     />
+        //  </TouchableOpacity>
+        // ),
       })
     },
 
@@ -170,6 +170,44 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
+      }
+    },
+
+    // SearchTab:{
+    //   screen: SearchTab
+    //   },
+
+    // ProfileTabInSearch:{ // view for profile
+    //   screen: ProfileTab,
+    //   navigationOptionsOtherProfile,
+    //   navigationOptions:{
+    //     headerTitleStyle: { alignSelf: 'center', flex:1},
+    //     headerStyle: {
+    //       backgroundColor:'#FFB6C1',
+    //     },
+    //     title: 'Profile',
+    //   }
+    // },
+
+    // HashtagTab:{
+    //   screen: HashtagTab
+    // },
+
+  }
+
+
+));
+
+const SearchTabStackNavigator = createAppContainer(createStackNavigator(
+  {
+    SearchTab:{
+      screen: SearchTab,
+      navigationOptions: {// options for header
+        title: 'Search',
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+        headerTitleStyle: { alignSelf: 'center', flex:1 },
       }
     },
 
@@ -194,24 +232,7 @@ const HomeTabStackNavigator = createAppContainer(createStackNavigator(
     },
 
   }
-
-
 ));
-
-// const SearchTabStackNavigator = createAppContainer(createStackNavigator(
-//   {
-//     SearchTab:{
-//       screen: SearchTab,
-//       navigationOptions: {// options for header
-//         title: 'Search',
-//         headerStyle: {
-//           backgroundColor:'#FFB6C1',
-//         },
-//         headerTitleStyle: { alignSelf: 'center', flex:1 },
-//       }
-//     }
-//   }
-// ));
 
 const LikesTabStackNavigator = createAppContainer(createStackNavigator(
   {
@@ -268,6 +289,16 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
           }
       },
 
+      SearchTab: {
+        screen: SearchTabStackNavigator,
+        navigationOptions: {
+          tabBarIcon: ({focused}) =>
+            <Image style={{ width: 54, height: 54, marginTop:15 }}
+                  source={focused? require('./assets/images/search_colored.png'):require('./assets/images/search.png')} />,
+
+        },
+      },
+
 
       AddMediaTab: {
           screen: AddMediaTabStackNavigator,
@@ -281,6 +312,12 @@ const AppTabNavigator = createAppContainer(createBottomTabNavigator(
 
       LikesTab: {
         screen: LikesTabStackNavigator,
+        navigationOptions: {
+          tabBarIcon: ({focused}) =>
+            <Image style={{ width: 54, height: 54, marginTop:15 }}
+                  source={focused? require('./assets/images/like_colored.png'):require('./assets/images/like.png')} />,
+
+        },
       },
 
       ProfileTab: {
