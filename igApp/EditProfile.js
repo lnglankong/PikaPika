@@ -262,7 +262,11 @@ class EditProfile extends Component{
           value={this.state.username}
         />
 
-        <Button title="Save Changes" onPress={this.handleProfileEdit} />
+        <TouchableOpacity style={styles.button} onPress={this.handleProfileEdit}>
+          <Text style={styles.buttonText}>
+            Save Changes
+          </Text>
+        </TouchableOpacity>
       </KeyboardAwareScrollView>
     )
   }
@@ -288,17 +292,41 @@ const styles = StyleSheet.create({
       color: "#FFB6C1"
     },
     customTextContainer:{
-      alignSelf: 'flex-start',
-      marginLeft: 10
+      alignSelf: 'center',
+      marginLeft: 10,
+      color: "#FFB6C1",
     },
     customTextInputContainer: {
-      alignSelf: 'flex-start',
-      marginLeft: 10
+      alignSelf: 'center',
+      marginLeft: 10,
+      height: 30,
+      width: 320,
+      borderColor: 'black',
+      backgroundColor:'#FFFFFF',
+      borderWidth: 1,
+      //marginTop: 30
     },
     scrollViewContainer: {
       flex: 1,
       flexDirection: 'column',
       justifyContent: 'space-between',
       alignItems: 'center'
+    },
+    buttonText: {
+      color: "black",
+      textAlign:'center',
+      fontSize: 20,
+      fontFamily:"Chalkboard SE",
+    },
+    button:{
+      marginLeft: '10%',
+      marginRight:'10%',
+      marginTop:15,
+      borderWidth: 1.5,
+      borderRadius: 15,
+      justifyContent: 'center',
+      height: 50,
+      width: 350,
+      backgroundColor:"#F7D2F7"
     }
 });
