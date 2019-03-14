@@ -33,6 +33,7 @@ class ProfileTab extends Component{
       comments: [],
       follow:"Follow",
       LoggedInUserID:"",
+      displayUserID:"",
       profilePicture: '',
     }
   }
@@ -65,8 +66,8 @@ class ProfileTab extends Component{
         this.setState({follow:"Unfollow"})
     })
 
-    //add notification to Notifications branch
-    rootRef.child('Notifications/' + userId).push({
+    //add a "follow" notification to Notifications branch
+    rootRef.child('Notifications/' + userId +'/' + Date.now()).update({
       'action': 'follow',
       'follower': this.state.LoggedInUserID,
     })
@@ -128,19 +129,27 @@ class ProfileTab extends Component{
         })
       })
 
-      //update new amount of likes on firebase
+      //update firebase posts branch and notification branch with new likes
       firebase.database().ref("Post/" + item.key).once('value', (snapshot) =>{
+        //update new amount of likes on firebase
         let currentLikes = snapshot.val().likes + 1;
-
         const postRef = rootRef.child('Post/' + item.key);
         postRef.update({likes: currentLikes});
-      })
 
+        //add a "like" notification to Notifications branch
+        const likedPostUserID = snapshot.val().userID;
+        rootRef.child('Notifications/' + likedPostUserID + '/' + Date.now()).update({
+          'action': 'like',
+          'liker': this.state.LoggedInUserID,
+          'likedPost': item.key,
+        })
+      })
       //add post ID to list of user's liked posts in state
       var likesArray = this.state.likedPosts;
       likesArray.push(item.key);
       this.setState({likesPosts: likesArray});
 
+      
     }else{ //already liked
       item.userLiked = false
 
@@ -349,7 +358,10 @@ class ProfileTab extends Component{
         //get logged-in user
        // var loginFile = require('./Login');
        var userID = await this.retrieveAuthToken()
-       this.setState({LoggedInUserID:userID})
+       this.setState({
+         LoggedInUserID:userID,
+         displayUserID:userID 
+        })
        console.log('user id is ', this.state.LoggedInUserID)
 
 
@@ -391,8 +403,11 @@ class ProfileTab extends Component{
          rootRef.child('Usernames/'+this.params.username).on("value",(snapshot) => {
             userId = snapshot.val();
          //   console.log(this.params.username)
-            console.log(userId)
+            console.log('userId here is ',userId)
             //get reference to the logged in user from database
+            this.setState({
+              displayUserID:userId 
+             })
 
              const userRef = rootRef.child('Users/' + userId);
              const followingRef = rootRef.child('Following/' + userId);
@@ -441,6 +456,7 @@ class ProfileTab extends Component{
          await new Promise(resolve => { setTimeout(resolve, 100); });
 
     }
+    console.log('display user id is ', this.state.displayUserID)
     this.getComments();
     await new Promise(resolve => { setTimeout(resolve, 400); });
     this.getFeedPosts();
@@ -523,11 +539,15 @@ async presentLocalNotification(){
                         </View>
                         <View style={{ alignItems: 'center' }}>
                             <Text>{this.state.followersNum}</Text>
-                            <Text style={{ fontSize: 15, color: 'grey',fontFamily:"Noteworthy" }}>Followers</Text>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('FollowerList', { userID: this.state.displayUserID })}>
+                              <Text style={{ fontSize: 15, color: 'grey',fontFamily:"Noteworthy" }}>Followers</Text>
+                            </TouchableOpacity>
                         </View>
                         <View style={{ alignItems: 'center' }}>
                             <Text>{this.state.followingNum}</Text>
-                            <Text style={{ fontSize: 15, color: 'grey',fontFamily:"Noteworthy" }}>Following</Text>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('FollowingList', { userID: this.state.displayUserID })}>
+                              <Text style={{ fontSize: 15, color: 'grey',fontFamily:"Noteworthy" }}>Following</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                     {this.params?// check if it is other's profile tab

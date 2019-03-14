@@ -110,6 +110,17 @@ class ViewComment extends Component{
       'userID': this.state.userID
     })
 
+    //add a "comment" notification to Notifications branch
+    firebase.database().ref().child('Post/' + this.props.navigation.state.params.postID).once('value', (snapshot) => {
+      rootRef.child('Notifications/' + snapshot.val().userID + '/' + Date.now()).update({
+        'action': 'comment',
+        'commenter': this.state.userID,
+        'commentedPost': this.props.navigation.state.params.postID,
+        'comment': this.state.comment,
+      })
+    })
+    
+    
     this.textInput.clear()
     this.getCommentData();
   }
