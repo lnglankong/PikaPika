@@ -51,7 +51,9 @@ class ViewComment extends Component{
       var date = '';
 
       childSnapshot.forEach((comment) => {
+        console.log('comment', comment.val().text);
 
+        //Delete these vars later
         commentText = comment.val().text;
         date = comment.val().date;
 
@@ -61,44 +63,33 @@ class ViewComment extends Component{
           profilePicture = childSnapshot.val().profile_picture;
 
           commentsArray.push({
-            comment: commentText,
+            comment: comment.val().text,
             profile_picture: profilePicture,
             username: username,
-            date: date,
+            date: comment.val().date,
             key: comment.key
           });
-
+          console.log(commentsArray);
           this.setState({comments: commentsArray});
         })
       })
     })
 
+    /*
     const wait = new Promise((resolve) => setTimeout(resolve, 2000));
     wait.then( () => {
         this.flatList.scrollToEnd({ animated: true });
     });
-
+    */
   }
 
   async componentDidMount(){
-    //get logged-in user
-
     this.getCommentData();
-
-    //await new Promise(resolve => { setTimeout(resolve, 500); });
-
-    //this.flatList.scrollToEnd({ animated: true });
   }
 
   async onRefresh(){
-    //console.log("profile tab Attempting to refresh");
     this.setState({isFetching: true})
-
     this.getCommentData();
-    //await new Promise(resolve => { setTimeout(resolve, 200); });
-
-    //this.flatList.scrollToEnd({ animated: true });
-
     this.setState({isFetching: false});
   }
 
@@ -136,7 +127,7 @@ class ViewComment extends Component{
       >
         <View style={styles.flatListContainer}>
           <FlatList
-            ref={ (ref) => { this.flatList = ref; }}
+            //ref={ (ref) => { this.flatList = ref; }}
             data = {this.state.comments}
             onRefresh={async () => this.onRefresh()}
             refreshing={this.state.isFetching}
