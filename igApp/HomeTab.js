@@ -31,8 +31,12 @@ class HomeTab extends Component{
     feedPostsArray: [],
     commentsCountArray: [],
     likedPosts: [],
-    isFetching: false,
+    getusersFollowingLoaded: false,
+    getFollowingPostsLoaded: false,
+    getCommentsLoaded: false,
+    getFeedPostsLoaded: false,
     LoggedInUserID: "",
+    isFetching: false
   }
 
 
@@ -67,158 +71,146 @@ class HomeTab extends Component{
 
     var usersFollowing = [];
 
-    firebase.database().ref('Following/' + loggedInUserID).once('value', (childSnapshot) => {
+
+    await firebase.database().ref('Following/' + loggedInUserID).once('value', async (childSnapshot) => {
 
       if(childSnapshot.exists()){ //if user is following people ... get the following IDs
 
         let followingKeys = Object.keys(childSnapshot.val());
 
-        followingKeys.forEach((currentFollowingUserID) => {
+        await followingKeys.forEach( (currentFollowingUserID) => {
           usersFollowing.push(currentFollowingUserID);
         })
-        this.setState({usersFollowing: usersFollowing});
+        await this.setState({usersFollowing: usersFollowing});
       }
     })
 
+
+
+
   }
 
-  getFollowingPosts(){
+  async getFollowingPosts(){
 
+    var followingPosts = []
 
-    this.state.usersFollowing.forEach((userFollowed) => {
+    await this.state.usersFollowing.forEach( (userFollowed) => {
 
-      firebase.database().ref('PostByUserID/' + userFollowed).once('value', (childSnapshot2) => {
+      firebase.database().ref('PostByUserID/' + userFollowed).once('value', async (childSnapshot2) => {
 
         if(childSnapshot2.exists()){ //if following user has posts...get their posts
           let postByUserIDKeys = Object.keys(childSnapshot2.val());
 
-          postByUserIDKeys.forEach((currentPostByUserID) => {
-            this.state.followingPosts.push(currentPostByUserID);
+          await postByUserIDKeys.forEach(async (currentPostByUserID) => {
+          await followingPosts.push(currentPostByUserID);
+          await this.state.followingPosts.push(currentPostByUserID);
           })
         }
       })
     })
+
+
   }
 
-  getComments(){
-    firebase.database().ref('Post/').once('value', (snapshot) => {
+  async getComments(){
+    //return new Promise(function (resolve, reject) {
+      await firebase.database().ref('Post/').once('value', async (snapshot) => {
 
-      var commentsList = [];
-      snapshot.forEach((post) => {
+        var commentsList = [];
+        await snapshot.forEach( (post) => {
 
-        if(this.state.followingPosts.includes(post.key)){
-          var commentsCount = 0;
+          if(this.state.followingPosts.includes(post.key)){
+            var commentsCount = 0;
 
-          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
+          firebase.database().ref('Post/' + post.key + '/comments').once('value', async (childSnapshot) => {
 
-            childSnapshot.forEach((comment) => {
-              commentsCount++;
+              childSnapshot.forEach( async (comment) => {
+                commentsCount++;
+              })
+              commentsList.push(commentsCount);
+              this.setState({commentsCountArray: commentsList});
             })
-            commentsList.push(commentsCount);
-            this.setState({commentsCountArray: commentsList});
-          })
-        }
+          }
+        })
       })
-    })
+    //  resolve(commentsList)
+
+    //})
+
+
   }
 
-  getFeedPosts(){
+  async getFeedPosts(){
     //Get the all the posts from the current postID
 
-    //firebase.database().ref('Post/').orderByChild('date').once('value', (snapshot) => {
-    firebase.database().ref('Post/').once('value', (snapshot) => {
+    await firebase.database().ref('Post/').once('value', async (snapshot) => {
 
       var feedList = [];
 
       let postCount = 0;
 
-      snapshot.forEach((post) => {
+        await snapshot.forEach( (post) => {
 
-        //check if the user is following this post...
-        if(this.state.followingPosts.includes(post.key)){
+          //check if the user is following this post...
+          if(this.state.followingPosts.includes(post.key)){
 
-          let username = '';
-          let profilePicture = '';
-          let commentsCount = '';
+            let username = '';
+            let profilePicture = '';
+            let commentsCount = '';
+            var liked = false;
+            var likesPicture = require('./assets/images/likeIcon.png');
 
-          //get profile picture of poster
-          firebase.database().ref('Post/' + post.key + '/comments').once('value', (childSnapshot) => {
-            snapshot = childSnapshot;
-            /*
-            childSnapshot.forEach((comment) => {
-              console.log("increasing comment count");
-              commentsCount++;
-            })*/
-          })
 
-          //get username and profile picture of poster
-          firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
-            username = childSnapshot.val().username;
-            profilePicture = childSnapshot.val().profile_picture;
-          })
+            //get username of poster
+             firebase.database().ref('Users/' + post.val().userID).once('value', (childSnapshot) => {
+              username = childSnapshot.val().username;
+              profilePicture = childSnapshot.val().profile_picture;
+            }).then( async () => {
+              // check whether or not user already liked this post
+              if(this.state.likedPosts.includes(post.key)){
+                // user has already liked this post
+                liked = true;
+                likesPicture = require('./assets/images/likeFilledIcon.png');
+              }
+            }).then(async () => {
+              //... get the post information
+              await feedList.push({
+                   caption: post.val().caption,
+                   commments: post.val().comments,
+                   date: post.val().date,
+                   picture: post.val().picture,
+                   username: username,
+                   likes: post.val().likes,
+                   commentsCount: this.state.commentsCountArray[postCount],
+                   profile_picture: profilePicture,
+                   likesPicture: likesPicture,
+                   userLiked: liked,
+                   postIndex: postCount,
+                   key: post.key,
+              });
 
-          var liked = false;
-          var likesPicture = require('./assets/images/likeIcon.png');
+              postCount++;
 
-          // check whether or not user already liked this post
-          if(this.state.likedPosts.includes(post.key)){
-            // user has already liked this post
-            liked = true;
-            likesPicture = require('./assets/images/likeFilledIcon.png');
+              await this.setState({feedPostsArray: feedList.reverse()});
+            })
+
           }
-
-
-
-          //... get the post information
-          feedList.push({
-               caption: post.val().caption,
-               commments: post.val().comments,
-               date: post.val().date,
-               picture: post.val().picture,
-               username: username,
-               likes: post.val().likes,
-               commentsCount: this.state.commentsCountArray[postCount],
-               profile_picture: profilePicture,
-               likesPicture: likesPicture,
-               userLiked: liked,
-               postIndex: postCount,
-               key: post.key,
-          });
-
-
-
-          postCount++;
-          //console.log("PostCount: " + postCount);
-
-          this.setState({feedPostsArray: feedList});
-          //console.log("Current postsarray: " + this.state.feedPostsArray);
-        }
-      })
-      //console.log("posts: " + this.state.feedPosts);
+        })
     })
   }
 
   async onRefresh(){
-    this.setState({isFetching: true})
-    this.getusersFollowing();
-    await new Promise(resolve => { setTimeout(resolve, 200); });
-    this.getFollowingPosts();
-    await new Promise(resolve => { setTimeout(resolve, 200); });
-    this.getComments();
-    await new Promise(resolve => { setTimeout(resolve, 200); });
-    this.getFeedPosts();
-    await new Promise(resolve => { setTimeout(resolve, 200); });
+    await this.setState({isFetching: true})
+    await this.getusersFollowing();
+    await this.getFollowingPosts();
+    await this.getComments();
+    await this.getFeedPosts();
 
     //reverse order of posts
-    var feedList = this.state.feedPostsArray;
-    feedList.reverse();
-    this.setState({feedPostsArray: feedList, loaded: true});
+    var feedList = this.state.feedPostsArray.reverse();
 
+    await this.setState({feedPostsArray: feedList, loaded: true});
 
-    // Sleep for half a second
-    await new Promise(resolve => { setTimeout(resolve, 500); });
-
-    this.setState(this.state.feedPosts);
     this.setState({isFetching: false});
   }
 
@@ -304,36 +296,27 @@ class HomeTab extends Component{
 
   }
 
-  async componentDidMount(){
-    //console.log("STATE IS: " + this.state.loaded);
+  async componentWillMount(){
 
     if(this.state.loaded == false){
-      //this.getActivityFeedPosts();
 
-      this.getusersFollowing();
-      await new Promise(resolve => { setTimeout(resolve, 500); });
-      this.getFollowingPosts();
-      await new Promise(resolve => { setTimeout(resolve, 500); });
-      this.getComments();
-      await new Promise(resolve => { setTimeout(resolve, 500); });
-      this.getFeedPosts();
-      await new Promise(resolve => { setTimeout(resolve, 500); });
+      await this.getusersFollowing();
+      await this.getFollowingPosts();
+      await this.getComments();
+      await this.getFeedPosts();
+      await this.setState({loaded: true})
 
-      //reverse order of posts
-      var feedList = this.state.feedPostsArray;
-      feedList.reverse();
-      this.setState({feedPostsArray: feedList, loaded: true});
-
-      // Sleep for half a second
-      await new Promise(resolve => { setTimeout(resolve, 500); });
     }
+
   }
 
 
   render(){
 
+    if (!this.state.loaded) {
+          return <View />
+    }
     return(
-
           <FlatList
             data = {this.state.feedPostsArray}
             onRefresh={async () => this.onRefresh()}
