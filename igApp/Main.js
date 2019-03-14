@@ -60,7 +60,7 @@ handleLoggedOut = async (navigation) => {
   // clear the storage and authToken when logged out
   console.log('attemp to logout')
   await AsyncStorage.removeItem('authToken')
-  
+
   firebase.auth().signOut().then(navigation.navigate("Login"))
 }
 
@@ -229,6 +229,16 @@ const SearchTabStackNavigator = createAppContainer(createStackNavigator(
 
     HashtagTab:{
       screen: HashtagTab
+    },
+
+    ViewComment:{ // show comments of a post
+      screen: ViewComment,
+      navigationOptionsViewComment,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
     },
 
   }
