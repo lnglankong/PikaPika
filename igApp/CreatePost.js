@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, Image, TextInput, Keyboard, TouchableWithoutFeedback, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Image, TextInput, Keyboard, TouchableWithoutFeedback, Text, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import firebase from './Firebase.js'
@@ -11,6 +11,9 @@ class CreatePost extends Component{
   state = {
     userID: "",
     caption: "",
+    username: "",
+    profilePicture: "",
+    loading: true
   };
 
   componentDidMount(){
@@ -20,7 +23,18 @@ class CreatePost extends Component{
 
     //get reference to the logged in user from database
     const userRef = firebase.database().ref().child('Users/' + loginFile.loggedInUser);
-    this.setState({ userID: userRef.key });
+
+    // get username and profile picture of post's user
+    let username = ""
+    let profilePicture = ""
+    userRef.once('value', (userSnapshot) => {
+      username = userSnapshot.val().username;
+      profilePicture = userSnapshot.val().profile_picture;
+    }).then( this.setState({ userID: userRef.key,
+                             username: username,
+                             profilePicture: profilePicture,
+                             loading: false}))
+
   }
 
   //add a new post to the database
@@ -31,7 +45,9 @@ class CreatePost extends Component{
       'date': new Date().toLocaleString(),
       'likes': 0,
       'picture': this.props.navigation.state.params.picture,
-      'userID': this.state.userID
+      'userID': this.state.userID,
+      'username' : this.state.username,
+      'profilePicture' : this.state.profilePicture
     })
 
     //add post to PostByUserID table
@@ -52,6 +68,11 @@ class CreatePost extends Component{
 
 
   render(){
+    if (this.state.loading) {
+      return (
+        <View/>
+      )
+    }
     return(
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <KeyboardAwareScrollView
