@@ -62,7 +62,7 @@ handleLoggedOut = async (navigation) => {
   // clear the storage and authToken when logged out
   console.log('attemp to logout')
   await AsyncStorage.removeItem('authToken')
-  
+
   firebase.auth().signOut().then(navigation.navigate("Login"))
 }
 
@@ -156,7 +156,7 @@ const ProfileTabStackNavigator = createAppContainer(
         },
         title: 'Following',
       },
-      
+
     }
 
   }
@@ -257,10 +257,14 @@ const SearchTabStackNavigator = createAppContainer(createStackNavigator(
         headerStyle: {
           backgroundColor:'#FFB6C1',
         },
-        
+
       }
     },
 
+    ViewComment:{ // show comments of a post
+      screen: ViewComment,
+      navigationOptionsViewComment,
+    },
     FollowerList:{
       screen:FollowerList,
       navigationOptions:{
