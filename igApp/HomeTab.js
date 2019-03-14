@@ -205,11 +205,7 @@ class HomeTab extends Component{
     await this.getFollowingPosts();
     await this.getComments();
     await this.getFeedPosts();
-
-    //reverse order of posts
-    var feedList = this.state.feedPostsArray.reverse();
-
-    await this.setState({feedPostsArray: feedList, loaded: true});
+    await this.setState({loaded: true});
 
     this.setState({isFetching: false});
   }
