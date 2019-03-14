@@ -46,7 +46,6 @@ class LikesTab extends Component{
         var notificationsArray = [];
 
         childSnapshot.forEach((notification) => {
-          console.log("notif", notification.val());
           if (notification.val().action === "follow") {
             //get username and profile picture of new follower
             firebase.database().ref('Users/' + notification.val().follower).once('value', async (snapshot) => {
@@ -56,8 +55,6 @@ class LikesTab extends Component{
                 actorImage: snapshot.val().profile_picture,
                 notifKey: notification.key,
               })
-              
-              console.log("push follow");
               this.setState({notifications: notificationsArray});
             })
           }
@@ -72,15 +69,23 @@ class LikesTab extends Component{
                   notifKey: notification.key,
                   postImage: postSnapshot.val().picture,
                 });
-                console.log("push like");
-
-                //this.setState({notifications: notificationsArray});
-                //notif = this.state.notifications[0];
-                //console.log("notifications[0].notifKey", notif.action);
-                let sortedNotifications = notificationsArray.sort((a, b) => {
-                  return b.actor - a.actor;
+                this.setState({notifications: notificationsArray});
+              })
+            })
+          }
+          else if (notification.val().action === "comment") {
+            //get username and profile picture of new follower
+            firebase.database().ref('Users/' + notification.val().commenter).once('value', (userSnapshot) => {
+              firebase.database().ref('Post/' + notification.val().commentedPost).once('value', async (postSnapshot) => {
+                await notificationsArray.push({
+                  action: "comment",
+                  actor: userSnapshot.val().username,
+                  actorImage: userSnapshot.val().profile_picture,
+                  notifKey: notification.key,
+                  postImage: postSnapshot.val().picture,
+                  comment: notification.val().comment,
                 });
-                this.setState({notifications: sortedNotifications});
+                this.setState({notifications: notificationsArray});
               })
             })
           }
@@ -130,19 +135,30 @@ class LikesTab extends Component{
             </Card>
           </View>
       )
+    } 
+    else if (item.action === "comment") {
+      return (
+        <View>
+            <Card style={{ flex: 1}}>
+              <CardItem>
+                <Left>
+                    <Thumbnail source={{uri: item.actorImage}} style={{borderWidth: 2, borderColor:'#d3d3d3'}}/>
+                    <Body>
+                        <Text style={{ fontWeight: "900" }}>{item.actor + " "} </Text>
+                        <Text>commented: {item.comment}</Text>
+                        <Text style={{color: '#FFB6C1'}}>{item.date}</Text>
+                    </Body>
+                    <Thumbnail source={{uri: item.postImage}} style={{borderColor:'#d3d3d3'}}/>
+                </Left>
+              </CardItem>
+
+            </Card>
+          </View>
+      )
     }
   }
 
   render(){
-    console.log("notifications array", this.state.notifications);
-    //notif = this.state.notifications[0];
-    //console.log("notifications[0].notifKey", notif.val());
-    /*
-    let sortedNotifications = this.state.notifications.sort((a, b) => {
-      return b.actor - a.actor;
-    });
-    console.log('sortedNotifs:', sortedNotifications);
-    */
     return(
       <View style={styles.flatListContainer}>
       <FlatList
