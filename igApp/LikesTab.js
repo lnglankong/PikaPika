@@ -13,43 +13,25 @@ class LikesTab extends Component{
   state = {
     LoggedInUserID: "",
     notifications: [],
+    isFetching: false,
   };
 
-  /*
-  retrieveAuthToken = async () => {
-    console.log('attempt  to retrieve')
-    try {
-      const value = await AsyncStorage.getItem('authToken');
-      console.log('retrieved the value, and the value is', value)
-      if (value !== null) {
-        // We have data!!
-        return value;
-       // return value
-      }else{
-        console.log('no value here!')
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
- */
-
-  async componentDidMount(){
+  getNotificationsData() {
     const loginFile = require('./HomeTab');
 
     //get reference to the logged in user from database
-    const userRef = await firebase.database().ref().child('Users/' + loginFile.loggedInUser);
+    const userRef = firebase.database().ref().child('Users/' + loginFile.loggedInUser);
     this.setState({ LoggedInUserID: userRef.key });
 
-    firebase.database().ref('Notifications/' + userRef.key).once('value', async (childSnapshot) => {
+    firebase.database().ref('Notifications/' + userRef.key).once('value', (childSnapshot) => {
       if(childSnapshot.exists()){
         var notificationsArray = [];
 
         childSnapshot.forEach((notification) => {
           if (notification.val().action === "follow") {
             //get username and profile picture of new follower
-            firebase.database().ref('Users/' + notification.val().follower).once('value', async (snapshot) => {
-              await notificationsArray.push({
+            firebase.database().ref('Users/' + notification.val().follower).once('value', (snapshot) => {
+              notificationsArray.push({
                 action: "follow",
                 actor: snapshot.val().username,
                 actorImage: snapshot.val().profile_picture,
@@ -61,8 +43,8 @@ class LikesTab extends Component{
           else if (notification.val().action === "like") {
             //get username and profile picture of new follower
             firebase.database().ref('Users/' + notification.val().liker).once('value', (userSnapshot) => {
-              firebase.database().ref('Post/' + notification.val().likedPost).once('value', async (postSnapshot) => {
-                await notificationsArray.push({
+              firebase.database().ref('Post/' + notification.val().likedPost).once('value', (postSnapshot) => {
+                notificationsArray.push({
                   action: "like",
                   actor: userSnapshot.val().username,
                   actorImage: userSnapshot.val().profile_picture,
@@ -76,8 +58,8 @@ class LikesTab extends Component{
           else if (notification.val().action === "comment") {
             //get username and profile picture of new follower
             firebase.database().ref('Users/' + notification.val().commenter).once('value', (userSnapshot) => {
-              firebase.database().ref('Post/' + notification.val().commentedPost).once('value', async (postSnapshot) => {
-                await notificationsArray.push({
+              firebase.database().ref('Post/' + notification.val().commentedPost).once('value', (postSnapshot) => {
+                notificationsArray.push({
                   action: "comment",
                   actor: userSnapshot.val().username,
                   actorImage: userSnapshot.val().profile_picture,
@@ -94,9 +76,18 @@ class LikesTab extends Component{
     })
   }
 
+  async componentDidMount(){
+    this.getNotificationsData();
+  }
+
+  async onRefresh(){
+    this.setState({isFetching: true})
+    await this.getNotificationsData();
+    this.setState({isFetching: false});
+  }
+
   // return different jsx depending on if notif is follow, like, or comment
   renderItem = ({item}) => {
-    //console.log(item.action);
     if(item.action === "follow") {
       return (
         <View>
@@ -107,7 +98,6 @@ class LikesTab extends Component{
                     <Body>
                         <Text style={{ fontWeight: "900" }}>{item.actor + " "} </Text>
                         <Text>started following you.</Text>
-                        <Text style={{color: '#FFB6C1'}}>{item.date}</Text>
                     </Body>
                 </Left>
               </CardItem>
@@ -126,9 +116,8 @@ class LikesTab extends Component{
                     <Body>
                         <Text style={{ fontWeight: "900" }}>{item.actor + " "} </Text>
                         <Text>liked your post.</Text>
-                        <Text style={{color: '#FFB6C1'}}>{item.date}</Text>
                     </Body>
-                    <Thumbnail source={{uri: item.postImage}} style={{borderColor:'#d3d3d3'}}/>
+                    <Thumbnail source={{uri: item.postImage}} style={{borderWidth: 2, borderColor:'#d3d3d3'}} square/>
                 </Left>
               </CardItem>
 
@@ -146,9 +135,8 @@ class LikesTab extends Component{
                     <Body>
                         <Text style={{ fontWeight: "900" }}>{item.actor + " "} </Text>
                         <Text>commented: {item.comment}</Text>
-                        <Text style={{color: '#FFB6C1'}}>{item.date}</Text>
                     </Body>
-                    <Thumbnail source={{uri: item.postImage}} style={{borderColor:'#d3d3d3'}}/>
+                    <Thumbnail source={{uri: item.postImage}} style={{borderWidth: 2, borderColor:'#d3d3d3'}} square/>
                 </Left>
               </CardItem>
 
@@ -163,8 +151,10 @@ class LikesTab extends Component{
       <View style={styles.flatListContainer}>
       <FlatList
         data = {this.state.notifications.sort((a, b) => a.notifKey.localeCompare(b.notifKey)).reverse()}
+        onRefresh={async () => this.onRefresh()}
+        refreshing={this.state.isFetching}
         renderItem={this.renderItem}
-        keyExtractor={(item, index) => item.notifKey}
+        keyExtractor={(item, index) => item.key}
       />
     </View>
     )
