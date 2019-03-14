@@ -14,6 +14,8 @@ import ViewComment from './ViewComment'
 import Login from './Login'
 import CreatePost from './CreatePost'
 import firebase from './Firebase.js'
+import FollowingList from './FollowingList'
+import FollowerList from './FollowerList'
 
 
 export default class Main extends React.Component {
@@ -134,6 +136,24 @@ const ProfileTabStackNavigator = createAppContainer(
           backgroundColor:'#FFB6C1',
         },
       }
+    },
+
+    FollowerList:{
+      screen:FollowerList,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
+    },
+
+    FollowingList:{
+      screen:FollowingList,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
     }
 
   }
@@ -228,8 +248,33 @@ const SearchTabStackNavigator = createAppContainer(createStackNavigator(
     },
 
     HashtagTab:{
-      screen: HashtagTab
+      screen: HashtagTab,
+      navigationOptions:{
+        headerTitleStyle: { alignSelf: 'center', flex:1},
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+        
+      }
     },
+
+    FollowerList:{
+      screen:FollowerList,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
+    },
+
+    FollowingList:{
+      screen:FollowingList,
+      navigationOptions:{
+        headerStyle: {
+          backgroundColor:'#FFB6C1',
+        },
+      }
+    }
 
   }
 ));
