@@ -1,6 +1,6 @@
 # PikaPika
 
-Developers;
+### Developers:
 
 
 Luc Nglankong
