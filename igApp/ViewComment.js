@@ -110,8 +110,8 @@ class ViewComment extends Component{
         'comment': this.state.comment,
       })
     })
-    
-    
+
+
     this.textInput.clear()
     this.getCommentData();
   }
